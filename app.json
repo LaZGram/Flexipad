@@ -29,7 +29,8 @@
       "permissions": [
         "android.permission.BLUETOOTH",
         "android.permission.BLUETOOTH_ADMIN",
-        "android.permission.BLUETOOTH_CONNECT"
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.CAMERA"
       ],
       "package": "com.golfpattadon.test",
       "runtimeVersion": "1.0.0"
@@ -41,7 +42,13 @@
     },
     "plugins": [
       "expo-router",
-      "react-native-ble-plx"
+      "react-native-ble-plx",
+      [
+        "expo-barcode-scanner",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera to scan QR codes."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

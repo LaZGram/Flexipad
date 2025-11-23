@@ -28,9 +28,18 @@ export default function TabLayout() {
 							}}
 						/>
 						<Tabs.Screen
+							name="connection"
+							options={{
+								tabBarLabel: "Connect",
+								tabBarIcon: ({ color, size }) => (
+									<FontAwesome5 name="bluetooth" size={size} color={color} />
+								),
+							}}
+						/>
+						<Tabs.Screen
 							name="Mode"
 							options={{
-								tabBarLabel: "Mode",
+								tabBarLabel: "Hit Mode",
 								tabBarIcon: ({ color, size }) => (
 									<FontAwesome5 name="running" size={size} color={color} />
 								),

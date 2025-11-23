@@ -1,0 +1,24 @@
+{
+  "mode": "pattern",
+  "padIncrementPerLevel": 2,
+  "mistakeBehavior": "continue",
+  "patternSettings": {
+    "initialSequenceLength": 4,
+    "maxSequenceLength": 12,
+    "stepTimingMs": 800,
+    "showPatternDurationMs": 2500,
+    "inputTimeoutMs": 4000
+  },
+  "gameSettings": {
+    "soundEnabled": true,
+    "vibrationEnabled": true,
+    "difficulty": "hard",
+    "repeatCount": 5
+  },
+  "metadata": {
+    "version": "1.0",
+    "createdDate": "2025-11-23",
+    "description": "Advanced Pattern Mode Configuration - High Difficulty",
+    "author": "Flexipad Trainer"
+  }
+}

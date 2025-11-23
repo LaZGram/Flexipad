@@ -56,7 +56,8 @@
     "react-native-stack": "^1.0.0-alpha11",
     "react-native-svg": "15.2.0",
     "react-native-web": "~0.19.10",
-    "twrnc": "^4.5.1"
+    "twrnc": "^4.5.1",
+    "expo-barcode-scanner": "~13.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

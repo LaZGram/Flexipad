@@ -165,8 +165,8 @@ function ShowPad(props: any) {
 							.filter((device) => device !== null)
 							.map((device, index) => (
 								<StillDevice
-									key={device?.id}
-									device={device as unknown as Device}
+									key={device!.device.id}
+									device={device!.device}
 									pad_no={index}
 									activePadIndex={props.activePadIndex}
 								/>
@@ -176,8 +176,8 @@ function ShowPad(props: any) {
 							.filter((device) => device !== null)
 							.map((device, index) => (
 								<DeviceDraggable
-									key={device?.id}
-									device={device as unknown as Device}
+									key={device!.device.id}
+									device={device!.device}
 									pad_no={index}
 								/>
 							))
