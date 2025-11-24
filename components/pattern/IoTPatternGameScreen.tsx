@@ -66,6 +66,12 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
   // Ref to track current lit pad to prevent duplicate commands
   const currentLitPad = useRef<number>(-1);
   
+  // Ref to track if we're in the input phase (prevents auto-play during pattern display)
+  const isInputPhaseActive = useRef<boolean>(false);
+  
+  // Ref to debounce button presses
+  const lastButtonPressTime = useRef<number[]>(new Array(9).fill(0));
+  
   // Monitor button state for all connected pads
   useEffect(() => {
     const connectedPads = connectedDevice.filter(device => device !== null);
@@ -199,6 +205,10 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
     
     console.log(`=== PLAYER INPUT PHASE ===`);
     console.log(`Waiting for player to repeat pattern...`);
+    
+    // Now activate input phase - this is when we start listening for button presses
+    isInputPhaseActive.current = true;
+    console.log(`🎯 Input phase activated - ready for player input`);
   };
 
   // Turn off all connected pads
@@ -225,6 +235,20 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
 
     console.log(`🎮 Starting game with pattern: [${newPattern.join(', ')}] -> [${newPattern.map(p => `Pad ${p + 1}`).join(', ')}]`);
 
+    // Reset all button states and timing to prevent auto-play
+    previousButtonStates.current = new Array(9).fill(false);
+    lastButtonPressTime.current = new Array(9).fill(0);
+    isInputPhaseActive.current = false;
+    
+    // Initialize current button states to prevent false triggers
+    if (Array.isArray(connectedDevice)) {
+      connectedDevice.forEach((device, index) => {
+        if (device && device.device) {
+          previousButtonStates.current[index] = device.button || false;
+        }
+      });
+    }
+
     setGameState({
       isPlaying: true,
       level: 1,
@@ -245,6 +269,8 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
   const stopGame = () => {
     // Turn off all pad lights
     currentLitPad.current = -1; // Reset lit pad tracking
+    isInputPhaseActive.current = false; // Deactivate input phase
+    
     if (Array.isArray(connectedDevice)) {
       connectedDevice.forEach((device: ConnectedDevice | null, index: number) => {
         if (device) {
@@ -333,6 +359,7 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
         // Show new pattern after delay
         setTimeout(async () => {
           console.log(`\n=== LEVEL ${nextLevel} ===`);
+          isInputPhaseActive.current = false; // Reset input phase before showing pattern
           await showPatternDisplay(newPattern);
         }, 1500);
       } else {
@@ -365,6 +392,7 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
           lastEvent: `Wrong pad! Restarting from Level 1. Pattern: [${newPattern.map(p => `Pad ${p + 1}`).join(', ')}]`,
         }));
         setTimeout(async () => {
+          isInputPhaseActive.current = false; // Reset input phase before showing pattern
           await showPatternDisplay(newPattern);
         }, 1500);
       } else {
@@ -378,6 +406,7 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
         }));
         setTimeout(async () => {
           console.log(`🔄 Restarting with current pattern: [${currentPatternCopy.join(', ')}]`);
+          isInputPhaseActive.current = false; // Reset input phase before showing pattern
           await showPatternDisplay(currentPatternCopy);
         }, 1000);
       }
@@ -389,14 +418,34 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
     if (!gameState.isPlaying) return;
     
     const checkButtonStates = () => {
+      // Only check button states if we're in the input phase
+      if (!isInputPhaseActive.current) {
+        // During pattern display phase, just update button states without triggering actions
+        connectedDevice.forEach((device, index) => {
+          if (device && device.device) {
+            previousButtonStates.current[index] = device.button || false;
+          }
+        });
+        return;
+      }
+      
       connectedDevice.forEach((device, index) => {
         if (device && device.device) {
-          const currentButtonState = device.button;
+          const currentButtonState = device.button || false;
           const previousState = previousButtonStates.current[index];
+          const currentTime = Date.now();
+          const lastPressTime = lastButtonPressTime.current[index];
           
-          // Detect button press (transition from false to true)
+          // Detect button press (transition from false to true) with debouncing
           if (currentButtonState && !previousState) {
-            handlePadPress(index);
+            // Debounce: ignore if pressed too recently (within 200ms)
+            if (currentTime - lastPressTime > 200) {
+              console.log(`🔘 Button ${index + 1} pressed - triggering handlePadPress`);
+              lastButtonPressTime.current[index] = currentTime;
+              handlePadPress(index);
+            } else {
+              console.log(`🔘 Button ${index + 1} press ignored (debounced)`);
+            }
           }
           
           previousButtonStates.current[index] = currentButtonState;
