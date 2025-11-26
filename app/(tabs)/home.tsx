@@ -15,7 +15,6 @@ interface GameModeCardProps {
 	description: string;
 	icon: React.ReactNode;
 	onPress: () => void;
-	comingSoon?: boolean;
 }
 
 const GameModeCard: React.FC<GameModeCardProps> = ({
@@ -23,38 +22,18 @@ const GameModeCard: React.FC<GameModeCardProps> = ({
 	description,
 	icon,
 	onPress,
-	comingSoon = false,
 }) => {
 	return (
 		<TouchableOpacity
-			style={[styles.modeCard, comingSoon && styles.comingSoonCard]}
-			onPress={comingSoon ? undefined : onPress}
-			disabled={comingSoon}
+			style={styles.modeCard}
+			onPress={onPress}
+			activeOpacity={0.8}
 		>
-			<View style={styles.iconContainer}>
+			<View style={styles.cardContent}>
 				{icon}
-				{comingSoon && (
-					<View style={styles.comingSoonBadge}>
-						<Text style={styles.comingSoonText}>Soon</Text>
-					</View>
-				)}
+				<Text style={styles.modeTitle}>{title}</Text>
+				<Text style={styles.modeDescription}>{description}</Text>
 			</View>
-			<View style={styles.textContainer}>
-				<Text style={[styles.modeTitle, comingSoon && styles.comingSoonTitle]}>
-					{title}
-				</Text>
-				<Text style={[styles.modeDescription, comingSoon && styles.comingSoonDescription]}>
-					{description}
-				</Text>
-			</View>
-			{!comingSoon && (
-				<MaterialIcons 
-					name="chevron-right" 
-					size={24} 
-					color="#666" 
-					style={styles.chevron}
-				/>
-			)}
 		</TouchableOpacity>
 	);
 };
@@ -70,178 +49,138 @@ const HomeScreen: React.FC = () => {
 		navigation.navigate("PatternMode");
 	};
 
-	return (
-		<ScrollView style={styles.container}>
-			<Text
-				style={[
-					tw`text-center font-bold text-white my-4 mt-8 shadow-lg`,
-					{
-						backgroundColor: "#419E68",
-						fontSize: 36,
-						marginHorizontal: "-10%",
-					},
-				]}
-			>
-				Game Modes
-			</Text>
-			
-			<View style={styles.content}>
-				<Text style={styles.subtitle}>
-					Choose your training mode to get started
+	const handleForbiddenColorModePress = () => {
+		navigation.navigate("ForbiddenColorMode");
+	};
+
+		return (
+			<View style={styles.container}>
+				<Text
+					style={[
+						tw`text-center font-bold text-white my-4 mt-8 shadow-lg`,
+						{
+							backgroundColor: "#4e54a3",
+							fontSize: 36,
+							marginHorizontal: "-10%",
+						},
+					]}
+				>
+					Flexipad Training
 				</Text>
-
-				<View style={styles.modesContainer}>
-					<GameModeCard
-						title="Hit Mode"
-						description="Configure hit detection, timing, and duration settings for reaction training"
-						icon={
-							<MaterialIcons 
-								name="sports-martial-arts" 
-								size={48} 
-								color="#419E68" 
-							/>
-						}
-						onPress={handleHitModePress}
-					/>
-
-					<GameModeCard
-						title="Pattern Mode"
-						description="Create custom light patterns and sequences for advanced training routines"
-						icon={
-							<FontAwesome5 
-								name="project-diagram" 
-								size={48} 
-								color="#FFA500" 
-							/>
-						}
-						onPress={handlePatternModePress}
-					/>
+				<View style={styles.headerSection}>
+					{/* <Text style={styles.title}>Flexipad Training</Text> */}
+					<Text style={styles.subtitle}>Choose your training mode</Text>
 				</View>
+			
+			<View style={styles.modesContainer}>
+				<GameModeCard
+					title="Reaction Training"
+					description="Test your speed and reflexes"
+					icon={
+						<MaterialIcons 
+							name="flash-on" 
+							size={42} 
+							color="#ffffff" 
+						/>
+					}
+					onPress={handleHitModePress}
+				/>
 
-				<View style={styles.infoSection}>
-					<Text style={styles.infoTitle}>Getting Started</Text>
-					<Text style={styles.infoText}>
-						• Connect your Flexipad devices from the Settings tab
-					</Text>
-					<Text style={styles.infoText}>
-						• Choose a training mode above
-					</Text>
-					<Text style={styles.infoText}>
-						• Configure your preferred settings
-					</Text>
-					<Text style={styles.infoText}>
-						• Start training!
-					</Text>
-				</View>
+				<GameModeCard
+					title="Pattern Memory"
+					description="Challenge your cognitive skills"
+					icon={
+						<FontAwesome5 
+							name="brain" 
+							size={38} 
+							color="#ffffff" 
+						/>
+					}
+					onPress={handlePatternModePress}
+				/>
+
+				<GameModeCard
+					title="Forbidden Color"
+					description="React to green, avoid red lights"
+					icon={
+						<MaterialIcons 
+							name="block" 
+							size={40} 
+							color="#ffffff" 
+						/>
+					}
+					onPress={handleForbiddenColorModePress}
+				/>
 			</View>
-		</ScrollView>
+		</View>
 	);
 };
 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#eaf7ff",
+		backgroundColor: "#ffffff",
+		paddingHorizontal: 24,
 	},
-	content: {
-		flex: 1,
-		paddingHorizontal: 20,
-		paddingTop: 20,
+	headerSection: {
+		alignItems: "center",
+		marginBottom: 48,
+	},
+	title: {
+		fontSize: 28,
+		fontWeight: "bold",
+		color: "#4e54a3",
+		textAlign: "center",
+		marginBottom: 8,
+		letterSpacing: -0.5,
 	},
 	subtitle: {
-		fontSize: 18,
-		color: "#666",
+		fontSize: 16,
+		color: "#8e94c7",
 		textAlign: "center",
-		marginBottom: 30,
 		fontWeight: "500",
+		letterSpacing: 0.3,
 	},
 	modesContainer: {
-		marginBottom: 40,
+		flex: 1,
+		justifyContent: "center",
+		gap: 20,
+		marginBottom: 80,
 	},
 	modeCard: {
-		backgroundColor: "#ffffff",
-		borderRadius: 15,
-		padding: 20,
-		marginBottom: 20,
-		flexDirection: "row",
+		backgroundColor: "#4e54a3",
+		borderRadius: 24,
+		padding: 28,
 		alignItems: "center",
-		shadowColor: "#000",
+		minHeight: 140,
+		justifyContent: "center",
+		shadowColor: "#4e54a3",
 		shadowOffset: {
 			width: 0,
-			height: 2,
+			height: 6,
 		},
-		shadowOpacity: 0.1,
-		shadowRadius: 4,
-		elevation: 3,
-		borderWidth: 1,
-		borderColor: "#e0e0e0",
+		shadowOpacity: 0.25,
+		shadowRadius: 12,
+		elevation: 8,
 	},
-	comingSoonCard: {
-		opacity: 0.7,
-		backgroundColor: "#f8f8f8",
-	},
-	iconContainer: {
-		position: "relative",
-		marginRight: 15,
-		width: 60,
-		height: 60,
-		justifyContent: "center",
+	cardContent: {
 		alignItems: "center",
-	},
-	comingSoonBadge: {
-		position: "absolute",
-		top: -5,
-		right: -5,
-		backgroundColor: "#FFA500",
-		borderRadius: 10,
-		paddingHorizontal: 6,
-		paddingVertical: 2,
-	},
-	comingSoonText: {
-		color: "white",
-		fontSize: 10,
-		fontWeight: "bold",
-	},
-	textContainer: {
-		flex: 1,
-		marginRight: 10,
 	},
 	modeTitle: {
 		fontSize: 20,
-		fontWeight: "bold",
-		color: "#333",
-		marginBottom: 5,
-	},
-	comingSoonTitle: {
-		color: "#888",
+		fontWeight: "700",
+		color: "#ffffff",
+		marginTop: 12,
+		marginBottom: 6,
+		letterSpacing: -0.3,
+		textAlign: "center",
 	},
 	modeDescription: {
 		fontSize: 14,
-		color: "#666",
-		lineHeight: 20,
-	},
-	comingSoonDescription: {
-		color: "#aaa",
-	},
-	chevron: {
-		marginLeft: "auto",
-	},
-	infoSection: {
-		backgroundColor: "#f0f8ff",
-		borderRadius: 10,
-		padding: 20,
-		marginBottom: 20,
-	},
-	infoTitle: {
-		fontSize: 18,
-		fontWeight: "bold",
-		color: "#333",
-		marginBottom: 15,
-	},
-	infoText: {
-		fontSize: 14,
-		color: "#555",
-		marginBottom: 8,
+		color: "rgba(255,255,255,0.85)",
+		textAlign: "center",
+		letterSpacing: 0.2,
+		fontWeight: "400",
 		lineHeight: 18,
 	},
 });

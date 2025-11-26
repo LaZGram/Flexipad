@@ -38,7 +38,7 @@ const PadIncrementSelector: React.FC<PadIncrementSelectorProps> = ({ value, onCh
           <MaterialIcons 
             name="remove" 
             size={20} 
-            color={value <= 1 ? '#ccc' : '#007bff'} 
+            color={value <= 1 ? '#ccc' : '#4e54a3'} 
           />
         </TouchableOpacity>
         
@@ -55,7 +55,7 @@ const PadIncrementSelector: React.FC<PadIncrementSelectorProps> = ({ value, onCh
           <MaterialIcons 
             name="add" 
             size={20} 
-            color={value >= 5 ? '#ccc' : '#007bff'} 
+            color={value >= 5 ? '#ccc' : '#4e54a3'} 
           />
         </TouchableOpacity>
       </View>
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#007bff',
+    color: '#4e54a3',
   },
   unit: {
     fontSize: 12,
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selectedOption: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#4e54a3',
     borderColor: '#0056b3',
   },
   optionText: {

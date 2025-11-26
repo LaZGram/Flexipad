@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 	},
 	activeTab: {
-		backgroundColor: "#419E68",
+		backgroundColor: "#4e54a3",
 	},
 	tabText: {
 		fontSize: 16,

@@ -200,8 +200,8 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
     console.log('Pattern display complete - turning off all LEDs');
     await turnOffAllPads();
     
-    // Brief pause before input phase
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Brief pause before input phase (reduced from 500ms to 200ms)
+    // await new Promise(resolve => setTimeout(resolve, 200));
     
     console.log(`=== PLAYER INPUT PHASE ===`);
     console.log(`Waiting for player to repeat pattern...`);
@@ -257,12 +257,12 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
       lastEvent: `Level 1 started! Pattern: [${newPattern.map(p => `Pad ${p + 1}`).join(', ')}]`,
     });
 
-    // Start with pattern display phase
+    // Start with pattern display phase (reduced delay for faster start)
     setTimeout(async () => {
       console.log(`🔄 About to display pattern: [${newPattern.join(', ')}]`);
       await showPatternDisplay(newPattern);
       // After pattern display, we wait for user input (no active lights)
-    }, 1000);
+    }, 10);
   };
 
   // Stop the game
@@ -323,10 +323,10 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
       // Send BLUE light feedback
       await sendPadCommand(pressedPadIndex, 'CORRECT_FEEDBACK');
       
-      // Turn off BLUE light after short moment
+      // Turn off BLUE light after short moment (reduced for snappier feedback)
       setTimeout(async () => {
         await sendPadCommand(pressedPadIndex, 'LIGHT_OFF');
-      }, 400);
+      }, 300);
       
       if (currentStep === currentPattern.length - 1) {
         // Pattern completed successfully!
@@ -356,12 +356,12 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
           lastEvent: `Level ${nextLevel} started! Pattern: [${newPattern.map(p => `Pad ${p + 1}`).join(', ')}]`,
         }));
         
-        // Show new pattern after delay
+        // Show new pattern after delay (reduced for faster progression)
         setTimeout(async () => {
           console.log(`\n=== LEVEL ${nextLevel} ===`);
           isInputPhaseActive.current = false; // Reset input phase before showing pattern
           await showPatternDisplay(newPattern);
-        }, 1500);
+        }, 800);
       } else {
         // Continue to next step in current pattern
         const nextStep = currentStep + 1;
@@ -394,7 +394,7 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
         setTimeout(async () => {
           isInputPhaseActive.current = false; // Reset input phase before showing pattern
           await showPatternDisplay(newPattern);
-        }, 1500);
+        }, 800);
       } else {
         // Continue - restart current pattern from the beginning
         console.log(`Restarting current pattern from beginning`);
@@ -408,7 +408,7 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
           console.log(`🔄 Restarting with current pattern: [${currentPatternCopy.join(', ')}]`);
           isInputPhaseActive.current = false; // Reset input phase before showing pattern
           await showPatternDisplay(currentPatternCopy);
-        }, 1000);
+        }, 600);
       }
     }
   }, [gameState, config, sendPadCommand, turnOffAllPads, generatePattern, showPatternDisplay]);

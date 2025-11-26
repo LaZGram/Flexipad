@@ -48,7 +48,7 @@ const MistakeBehaviorSelector: React.FC<MistakeBehaviorSelectorProps> = ({ value
                 <MaterialIcons
                   name={behavior.icon as any}
                   size={20}
-                  color={value === behavior.key ? '#fff' : '#007bff'}
+                  color={value === behavior.key ? '#fff' : '#4e54a3'}
                 />
               </View>
               <View style={styles.radioContainer}>
@@ -104,15 +104,16 @@ const styles = StyleSheet.create({
   },
   option: {
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: '#e9ecef', 
     borderRadius: 8,
     padding: 16,
     backgroundColor: '#fff',
   },
   selectedOption: {
-    borderColor: '#007bff',
+    borderColor: '#4e54a3',
     backgroundColor: '#f8fbff',
   },
+
   optionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -127,10 +128,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#007bff',
+    borderColor: '#4e54a3',
   },
   selectedIconContainer: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#4e54a3',
     borderColor: '#0056b3',
   },
   radioContainer: {
@@ -146,13 +147,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   selectedRadioOuter: {
-    borderColor: '#007bff',
+    borderColor: '#4e54a3',
   },
   radioInner: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#007bff',
+    backgroundColor: '#4e54a3',
   },
   textContainer: {
     flex: 1,
@@ -164,7 +165,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   selectedTitle: {
-    color: '#007bff',
+    color: '#4e54a3',
   },
   optionDescription: {
     fontSize: 14,

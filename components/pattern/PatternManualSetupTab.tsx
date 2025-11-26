@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
   },
   settingValue: {
     fontSize: 14,
-    color: '#007bff',
+    color: '#4e54a3',
     fontWeight: '600',
     textAlign: 'right',
   },
@@ -254,7 +254,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selectedOption: {
-    backgroundColor: '#007bff',
+    backgroundColor: '#4e54a3',
     borderColor: '#007bff',
   },
   optionText: {

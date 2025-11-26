@@ -1,23 +1,21 @@
 import React from "react";
 import { ModuleContextProvider } from "../../components/context/context";
-import { BleProvider } from "../../components/context/blecontext";
 import { Tabs } from "expo-router";
 import { FontAwesome5, FontAwesome } from "@expo/vector-icons";
 import { IconPositionProvider } from "../../components/IconPositionContext";
 
 export default function TabLayout() {
 	return (
-		<BleProvider>
-			<IconPositionProvider>
-				<ModuleContextProvider>
-					<Tabs
-						screenOptions={{
-							tabBarActiveTintColor: "#2f95dc",
-							tabBarInactiveTintColor: "gray",
-							tabBarStyle: { backgroundColor: "#fff" },
-							headerShown: false,
-						}}
-					>
+		<IconPositionProvider>
+			<ModuleContextProvider>
+				<Tabs
+					screenOptions={{
+						tabBarActiveTintColor: "#2f95dc",
+						tabBarInactiveTintColor: "gray",
+						tabBarStyle: { backgroundColor: "#fff" },
+						headerShown: false,
+					}}
+				>
 						<Tabs.Screen
 							name="home"
 							options={{
@@ -70,6 +68,5 @@ export default function TabLayout() {
 					</Tabs>
 				</ModuleContextProvider>
 			</IconPositionProvider>
-		</BleProvider>
 	);
 }

@@ -92,19 +92,19 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 20,
     paddingVertical: 16,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#4e54a3',
     borderBottomWidth: 1,
     borderBottomColor: '#e9ecef',
   },
   title: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#333',
+    color: '#ffffffff',
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 14,
-    color: '#666',
+    color: '#efefefff',
     lineHeight: 20,
   },
   content: {

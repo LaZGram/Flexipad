@@ -128,7 +128,7 @@ const ModeScreen: React.FC = () => {
 				style={[
 					tw`text-center font-bold text-white my-4 mt-8 shadow-lg`,
 					{
-						backgroundColor: "#419E68",
+						backgroundColor: "#4e54a3",
 						fontSize: 36,
 						marginHorizontal: "-10%",
 					},
