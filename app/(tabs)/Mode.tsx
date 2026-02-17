@@ -5,16 +5,20 @@ import {
 	ScrollView,
 	StyleSheet,
 	Alert,
+	TouchableOpacity,
 } from "react-native";
 import tw from "twrnc";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { useRouter } from "expo-router";
+import { MaterialIcons } from "@expo/vector-icons";
 import TabHeader from "@/components/mode/TabHeader";
 import ManualSetupTab from "@/components/mode/ManualSetupTab";
 import QRScanTab from "@/components/mode/QRScanTab";
-import { LightOutData, LightDelayData, DurationData } from "@/components/mode/types";
+import { LightOutData, LightDelayData, DurationData, RoundPadData } from "@/components/mode/types";
 
 const ModeScreen: React.FC = () => {
 	const navigation = useNavigation<NavigationProp<any>>();
+	const router = useRouter();
 	const [activeTab, setActiveTab] = useState<"manual" | "qr">("manual");
 	const [light_out_data, set_light_out_data] = useState<LightOutData>({
 		lightOut: "",
@@ -34,6 +38,8 @@ const ModeScreen: React.FC = () => {
 		minDuration: 0,
 		secDuration: 0,
 	});
+
+	const [round_pads, set_round_pads] = useState<RoundPadData[] | undefined>(undefined);
 
 	const get_random_delay = (): number => {
 		return parseFloat((Math.random() * (5.0 - 0.5) + 0.5).toFixed(2));
@@ -84,17 +90,23 @@ const ModeScreen: React.FC = () => {
 		lightOutData: LightOutData,
 		lightDelayData: LightDelayData,
 		durationData: DurationData,
-		metadata: any
+		metadata: any,
+		roundPads?: RoundPadData[]
 	) => {
 		// Import the configuration data
 		set_light_out_data(lightOutData);
 		set_light_delay_data(lightDelayData);
 		set_duration_data(durationData);
+		set_round_pads(roundPads);
 		
 		// Switch to manual setup tab to show imported values
 		setActiveTab("manual");
 		
-		console.log("Configuration imported:", { lightOutData, lightDelayData, durationData, metadata });
+		console.log("Configuration imported:", { lightOutData, lightDelayData, durationData, roundPads, metadata });
+	};
+
+	const handleViewHistory = () => {
+		router.push('/hit-mode-history');
 	};
 
 	const handle_finish = () => {
@@ -116,6 +128,7 @@ const ModeScreen: React.FC = () => {
 			hitduration: duration_data.hitduration,
 			minDuration: duration_data.minDuration,
 			secDuration: duration_data.secDuration,
+			roundPads: round_pads,
 		});
 		console.log(
 			`go to the start page ${light_out_data.lightOut} ${light_out_data.hitCount} ${light_out_data.timeout} ${light_delay_data.lightDelay} ${light_delay_data.delaytime} ${duration_data.duration} ${duration_data.hitduration} ${duration_data.minDuration} ${duration_data.secDuration}`
@@ -124,18 +137,39 @@ const ModeScreen: React.FC = () => {
 
 	return (
 		<View style={styles.container}>
-			<Text
+			<View
 				style={[
-					tw`text-center font-bold text-white my-4 mt-8 shadow-lg`,
+					tw`flex-row items-center justify-between px-4 py-4 mt-8`,
 					{
 						backgroundColor: "#4e54a3",
-						fontSize: 36,
-						marginHorizontal: "-10%",
 					},
 				]}
 			>
-				Hit Mode
-			</Text>
+				<TouchableOpacity
+					onPress={() => router.push('/(tabs)/home')}
+					style={tw`p-1`}
+				>
+					<MaterialIcons name="arrow-back" size={32} color="#fff" />
+				</TouchableOpacity>
+				
+				<Text
+					style={[
+						tw`font-bold text-white`,
+						{
+							fontSize: 36,
+						},
+					]}
+				>
+					Hit Mode
+				</Text>
+				
+				<TouchableOpacity 
+					style={tw`p-1`}
+					onPress={handleViewHistory}
+				>
+					<MaterialIcons name="history" size={32} color="#fff" />
+				</TouchableOpacity>
+			</View>
 			
 			<TabHeader 
 				activeTab={activeTab} 

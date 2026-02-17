@@ -100,14 +100,18 @@ function ShowPad(props: any) {
 			}}
 		>
 			<View style={styles.draggableContainer}>
-				<TouchableOpacity onPress={() => console.log("Pad pressed", pad_no)}>
+				<TouchableOpacity
+					style={styles.touchable}
+					onPress={() => console.log("Pad pressed", pad_no)}
+				>
 					<MaterialIcons
-						name="wb-twilight"
-						size={60}
-						color="black"
-						style={styles.icon}
+					name="wb-twilight"
+					size={60}
+					color="black"
 					/>
-					<Text>Trainer Pad : {pad_no + 1}</Text>
+					<Text style={styles.padText}>
+					Pad: {pad_no + 1}
+					</Text>
 				</TouchableOpacity>
 			</View>
 		</Draggable>
@@ -195,10 +199,23 @@ function ShowPad(props: any) {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#e1f4f3",
+		// backgroundColor: "#ffffff",
 	},
 	draggableContainer: {
 		alignItems: "center",
+		justifyContent: "center",
+	},
+
+	touchable: {
+		alignItems: "center",
+		justifyContent: "center",
+	},
+
+	padText: {
+		marginTop: 0,
+		textAlign: "center",
+		fontSize: 16,
+		fontWeight: "500",
 	},
 	icon: {
 		marginLeft: 20,

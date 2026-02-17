@@ -253,7 +253,7 @@ const BLE = () => {
 
         <View style={[tw`ml-4 mr-20`]}>
           <Text style={tw`text-base font-bold text-black mb-1`}>
-            Device ID: {connectDevice.device.id ?? "N/A"}
+            รหัสอุปกรณ์: {connectDevice.device.id ?? "N/A"}
           </Text>
           <Text
             style={[
@@ -267,14 +267,14 @@ const BLE = () => {
                 : styles.disconnectedText,
             ]}
           >
-            Status:{" "}
+            สถานะ:{" "}
             {isConnect
               ? isConnectingOrDisconnecting
-                ? "Disconnecting..."
-                : "Connected"
+                ? "กำลังตัดการเชื่อมต่อ..."
+                : "เชื่อมต่อแล้ว"
               : isConnectingOrDisconnecting
-              ? "Connecting..."
-              : "Disconnected"}
+              ? "กำลังเชื่อมต่อ..."
+              : "ยังไม่เชื่อมต่อ"}
           </Text>
 
           <Text
@@ -290,8 +290,8 @@ const BLE = () => {
             ]}
           >
             {connectDevice?.isCharging
-              ? "Battery Charging"
-              : `Battery Percentage: ${connectDevice?.battery?.toFixed(2)}`}
+              ? "กำลังชาร์จแบตเตอรี่"
+              : `แบตเตอรี่: ${connectDevice?.battery?.toFixed(2)}`}
           </Text>
         </View>
 
@@ -302,11 +302,11 @@ const BLE = () => {
           <Text style={tw`text-gray-700`}>
             {isConnect
               ? isConnectingOrDisconnecting
-                ? "Disconnecting..."
-                : "Disconnect"
+                ? "กำลังตัดการเชื่อมต่อ..."
+                : "ตัดการเชื่อมต่อ"
               : isConnectingOrDisconnecting
-              ? "Connecting..."
-              : "Connect"}
+              ? "กำลังเชื่อมต่อ..."
+              : "เชื่อมต่อ"}
           </Text>
         </TouchableOpacity>
       </View>
@@ -338,9 +338,9 @@ const BLE = () => {
         {/* Ensure text takes up remaining space */}
         <View style={tw`ml-4 flex-1`}>
           <Text style={tw`text-base font-bold text-black mb-1`}>
-            Disconnected Device ID: {device.id}
+            รหัสอุปกรณ์ที่ยังไม่เชื่อมต่อ: {device.id}
           </Text>
-          <Text style={styles.disconnectedText}>Status: Disconnected</Text>
+          <Text style={styles.disconnectedText}>สถานะ: ยังไม่เชื่อมต่อ</Text>
         </View>
 
         {/* Adjust button to avoid overlap */}
@@ -349,7 +349,7 @@ const BLE = () => {
           onPress={() => toggleConnection(device)}
         >
           <Text style={tw`text-gray-700`}>
-            {isConnecting ? "Connecting..." : "Connect"}
+            {isConnecting ? "กำลังเชื่อมต่อ..." : "เชื่อมต่อ"}
           </Text>
         </TouchableOpacity>
       </View>
@@ -357,12 +357,12 @@ const BLE = () => {
   };
 
   return (
-    <View style={[tw`flex-1`, { backgroundColor: "#E8F5E9" }]}>
+    <View style={[tw`flex-1`, { backgroundColor: "#ffffff" }]}>
       {/* Header */}
       <Text
         style={[
           tw`text-center font-bold text-white my-4 mt-8 shadow-lg`,
-          { backgroundColor: "#419E68", fontSize: 36 },
+          { backgroundColor: "#4e54a3", fontSize: 36 },
         ]}
       >
         Settings
@@ -374,7 +374,7 @@ const BLE = () => {
         <View style={tw`flex-1`}>
           <View style={tw`bg-white shadow-lg`}>
             <Text style={tw`text-lg font-bold text-black rounded-lg p-2`}>
-              Connected Devices
+              อุปกรณ์ที่เชื่อมต่อแล้ว
             </Text>
           </View>
           <FlatList
@@ -391,7 +391,7 @@ const BLE = () => {
               />
             )}
             ListEmptyComponent={
-              <Text style={tw`mx-4 my-2`}>No connected devices</Text>
+              <Text style={tw`mx-4 my-2`}>ไม่มีอุปกรณ์ที่เชื่อมต่อ</Text>
             }
             contentContainerStyle={{ flexGrow: 1 }}
           />
@@ -401,7 +401,7 @@ const BLE = () => {
         <View style={tw`flex-1`}>
           <View style={tw`bg-white shadow-lg`}>
             <Text style={tw`text-lg font-bold text-black rounded-lg p-2`}>
-              Disconnected Devices
+              อุปกรณ์ที่ยังไม่เชื่อมต่อ
             </Text>
           </View>
           <FlatList
@@ -415,7 +415,7 @@ const BLE = () => {
               />
             )}
             ListEmptyComponent={
-              <Text style={tw`mx-4 my-2`}>No disconnected devices</Text>
+              <Text style={tw`mx-4 my-2`}>ไม่มีอุปกรณ์ที่ยังไม่เชื่อมต่อ</Text>
             }
             contentContainerStyle={{ flexGrow: 1 }}
           />
@@ -425,7 +425,7 @@ const BLE = () => {
       {/* Scan Button */}
       <Button
         onPress={startScan}
-        title={scanning ? "Scanning..." : "Start Scan"}
+        title={scanning ? "กำลังสแกน..." : "สแกน"}
         disabled={scanning}
       />
 

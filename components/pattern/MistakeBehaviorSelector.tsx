@@ -11,24 +11,19 @@ const MistakeBehaviorSelector: React.FC<MistakeBehaviorSelectorProps> = ({ value
   const behaviors = [
     {
       key: 'restart' as const,
-      title: 'Restart from Beginning',
-      description: 'When player makes a mistake or times out, restart from level 1',
+      title: 'เริ่มใหม่ตั้งแต่ต้น',
       icon: 'replay',
     },
     {
       key: 'continue' as const,
-      title: 'Continue Until Correct',
-      description: 'Player keeps trying current step until they get it right',
+      title: 'เล่นต่อจนกว่าจะถูก',
       icon: 'repeat',
     },
   ];
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Behavior on Mistake/Timeout</Text>
-      <Text style={styles.description}>
-        What happens when player hits wrong pad or doesn't hit in time
-      </Text>
+      <Text style={styles.label}>เมื่อทำผิดหรือหมดเวลา</Text>
       
       <View style={styles.optionsContainer}>
         {behaviors.map((behavior) => (
@@ -41,15 +36,23 @@ const MistakeBehaviorSelector: React.FC<MistakeBehaviorSelectorProps> = ({ value
             onPress={() => onChange(behavior.key)}
           >
             <View style={styles.optionHeader}>
-              <View style={[
-                styles.iconContainer,
-                value === behavior.key && styles.selectedIconContainer
-              ]}>
-                <MaterialIcons
-                  name={behavior.icon as any}
-                  size={20}
-                  color={value === behavior.key ? '#fff' : '#4e54a3'}
-                />
+              <View style={styles.leftSection}>
+                <View style={[
+                  styles.iconContainer,
+                  value === behavior.key && styles.selectedIconContainer
+                ]}>
+                  <MaterialIcons
+                    name={behavior.icon as any}
+                    size={20}
+                    color={value === behavior.key ? '#fff' : '#4e54a3'}
+                  />
+                </View>
+                <Text style={[
+                  styles.title,
+                  value === behavior.key && styles.selectedTitle
+                ]}>
+                  {behavior.title}
+                </Text>
               </View>
               <View style={styles.radioContainer}>
                 <View style={[
@@ -62,21 +65,6 @@ const MistakeBehaviorSelector: React.FC<MistakeBehaviorSelectorProps> = ({ value
                 </View>
               </View>
             </View>
-            
-            <View style={styles.textContainer}>
-              <Text style={[
-                styles.title,
-                value === behavior.key && styles.selectedTitle
-              ]}>
-                {behavior.title}
-              </Text>
-              <Text style={[
-                styles.optionDescription,
-                value === behavior.key && styles.selectedDescription
-              ]}>
-                {behavior.description}
-              </Text>
-            </View>
           </TouchableOpacity>
         ))}
       </View>
@@ -86,27 +74,22 @@ const MistakeBehaviorSelector: React.FC<MistakeBehaviorSelectorProps> = ({ value
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 24,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
-  },
-  description: {
-    fontSize: 14,
-    color: '#666',
     marginBottom: 16,
   },
+  label: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 10,
+  },
   optionsContainer: {
-    gap: 12,
+    gap: 10,
   },
   option: {
-    borderWidth: 1,
-    borderColor: '#e9ecef', 
-    borderRadius: 8,
-    padding: 16,
+    borderWidth: 1.5,
+    borderColor: '#e0e0e0', 
+    borderRadius: 10,
+    padding: 12,
     backgroundColor: '#fff',
   },
   selectedOption: {
@@ -118,12 +101,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+  },
+  leftSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    flex: 1,
   },
   iconContainer: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     backgroundColor: '#f8fbff',
     alignItems: 'center',
     justifyContent: 'center',
@@ -159,10 +147,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   title: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 4,
   },
   selectedTitle: {
     color: '#4e54a3',

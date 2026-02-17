@@ -1,5 +1,5 @@
 import { QRConfigurationData, VALIDATION_RULES } from './types';
-import { LightOutData, LightDelayData, DurationData } from '../types';
+import { LightOutData, LightDelayData, DurationData, RoundPadData } from '../types';
 
 export interface ValidationError {
   field: string;
@@ -41,6 +41,7 @@ export class QRConfigValidator {
         this.validateLightOut(data.configuration.lightOut, errors);
         this.validateLightDelay(data.configuration.lightDelay, errors);
         this.validateDuration(data.configuration.duration, errors);
+        this.validateRoundPads(data.configuration.roundPads, errors, warnings);
       } else {
         errors.push({
           field: 'configuration',
@@ -332,6 +333,86 @@ export class QRConfigValidator {
       });
     }
   }
+
+  private static validateRoundPads(roundPads: any, errors: ValidationError[], warnings: ValidationError[]) {
+    if (!roundPads) {
+      // Optional field, no warning needed
+      return;
+    }
+
+    const rules = VALIDATION_RULES.roundPads;
+
+    if (!Array.isArray(roundPads)) {
+      errors.push({
+        field: 'roundPads',
+        message: 'roundPads must be an array',
+        code: 'INVALID_ROUND_PADS_TYPE'
+      });
+      return;
+    }
+
+    if (roundPads.length === 0) {
+      warnings.push({
+        field: 'roundPads',
+        message: 'roundPads array is empty',
+        code: 'EMPTY_ROUND_PADS'
+      });
+      return;
+    }
+
+    // Validate each round pad entry
+    roundPads.forEach((entry, index) => {
+      if (!entry || typeof entry !== 'object') {
+        errors.push({
+          field: `roundPads[${index}]`,
+          message: 'Each roundPad entry must be an object',
+          code: 'INVALID_ROUND_PAD_ENTRY'
+        });
+        return;
+      }
+
+      // Validate round number
+      if (entry.round === undefined || entry.round === null) {
+        errors.push({
+          field: `roundPads[${index}].round`,
+          message: 'Round number is required',
+          code: 'MISSING_ROUND_NUMBER'
+        });
+      } else if (typeof entry.round !== 'number' || entry.round < rules.minRound || entry.round > rules.maxRound) {
+        errors.push({
+          field: `roundPads[${index}].round`,
+          message: `Round number must be between ${rules.minRound} and ${rules.maxRound}`,
+          code: 'INVALID_ROUND_NUMBER'
+        });
+      }
+
+      // Validate pad number
+      if (entry.pad === undefined || entry.pad === null) {
+        errors.push({
+          field: `roundPads[${index}].pad`,
+          message: 'Pad number is required',
+          code: 'MISSING_PAD_NUMBER'
+        });
+      } else if (typeof entry.pad !== 'number' || entry.pad < rules.minPad || entry.pad > rules.maxPad) {
+        errors.push({
+          field: `roundPads[${index}].pad`,
+          message: `Pad number must be between ${rules.minPad} and ${rules.maxPad}`,
+          code: 'INVALID_PAD_NUMBER'
+        });
+      }
+    });
+
+    // Check for duplicate rounds
+    const rounds = roundPads.map((entry: any) => entry.round).filter((r: any) => r !== undefined);
+    const uniqueRounds = new Set(rounds);
+    if (rounds.length !== uniqueRounds.size) {
+      warnings.push({
+        field: 'roundPads',
+        message: 'Duplicate round numbers detected',
+        code: 'DUPLICATE_ROUNDS'
+      });
+    }
+  }
 }
 
 // Configuration converter
@@ -341,6 +422,7 @@ export class QRConfigConverter {
     lightOutData: LightOutData;
     lightDelayData: LightDelayData;
     durationData: DurationData;
+    roundPads?: RoundPadData[];
   } {
     const { configuration } = qrData;
     
@@ -367,10 +449,14 @@ export class QRConfigConverter {
       secDuration: configuration.duration.timeoutDuration?.seconds || 0
     };
 
+    // Convert roundPads if present
+    const roundPads = configuration.roundPads || undefined;
+
     return {
       lightOutData,
       lightDelayData,
-      durationData
+      durationData,
+      roundPads
     };
   }
 

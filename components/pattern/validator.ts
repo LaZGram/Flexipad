@@ -1,4 +1,4 @@
-import { PatternModeConfig } from './types';
+import { PatternModeConfig, LevelPattern } from './types';
 
 export const validatePatternModeConfig = (data: any): { isValid: boolean; config?: PatternModeConfig; error?: string } => {
   try {
@@ -20,6 +20,49 @@ export const validatePatternModeConfig = (data: any): { isValid: boolean; config
     // Validate mistakeBehavior
     if (!['restart', 'continue'].includes(data.mistakeBehavior)) {
       return { isValid: false, error: 'mistakeBehavior must be either "restart" or "continue"' };
+    }
+
+    // Validate levelPatterns if provided (optional field)
+    if (data.levelPatterns !== undefined) {
+      if (!Array.isArray(data.levelPatterns)) {
+        return { isValid: false, error: 'levelPatterns must be an array' };
+      }
+
+      for (let i = 0; i < data.levelPatterns.length; i++) {
+        const levelPattern = data.levelPatterns[i];
+        
+        if (!levelPattern || typeof levelPattern !== 'object') {
+          return { isValid: false, error: `levelPatterns[${i}] must be an object` };
+        }
+
+        if (!Number.isInteger(levelPattern.level) || levelPattern.level < 1) {
+          return { isValid: false, error: `levelPatterns[${i}].level must be a positive integer` };
+        }
+
+        if (!Array.isArray(levelPattern.pattern)) {
+          return { isValid: false, error: `levelPatterns[${i}].pattern must be an array` };
+        }
+
+        if (levelPattern.pattern.length === 0) {
+          return { isValid: false, error: `levelPatterns[${i}].pattern cannot be empty` };
+        }
+
+        // Validate each pad index in the pattern
+        for (let j = 0; j < levelPattern.pattern.length; j++) {
+          const padIndex = levelPattern.pattern[j];
+          if (!Number.isInteger(padIndex) || padIndex < 0 || padIndex > 8) {
+            return { isValid: false, error: `levelPatterns[${i}].pattern[${j}] must be an integer between 0 and 8 (pad index)` };
+          }
+        }
+      }
+
+      // Validate level numbers are sequential and start from 1
+      const levels = data.levelPatterns.map((lp: any) => lp.level).sort((a: number, b: number) => a - b);
+      for (let i = 0; i < levels.length; i++) {
+        if (levels[i] !== i + 1) {
+          return { isValid: false, error: 'levelPatterns must have sequential level numbers starting from 1' };
+        }
+      }
     }
 
     // Validate patternSettings
@@ -59,10 +102,6 @@ export const validatePatternModeConfig = (data: any): { isValid: boolean; config
 
     if (typeof gameSettings.vibrationEnabled !== 'boolean') {
       return { isValid: false, error: 'gameSettings.vibrationEnabled must be a boolean' };
-    }
-
-    if (!['easy', 'medium', 'hard'].includes(gameSettings.difficulty)) {
-      return { isValid: false, error: 'gameSettings.difficulty must be "easy", "medium", or "hard"' };
     }
 
     if (!Number.isInteger(gameSettings.repeatCount) || gameSettings.repeatCount < 1) {

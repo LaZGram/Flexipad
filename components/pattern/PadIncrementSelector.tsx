@@ -24,10 +24,7 @@ const PadIncrementSelector: React.FC<PadIncrementSelectorProps> = ({ value, onCh
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Pad Increment Per Level</Text>
-      <Text style={styles.description}>
-        How many pads are added to the sequence each level
-      </Text>
+      <Text style={styles.label}>จำนวน Pad ที่เพิ่มขึ้นต่อเลเวล</Text>
       
       <View style={styles.selectorContainer}>
         <TouchableOpacity
@@ -44,7 +41,7 @@ const PadIncrementSelector: React.FC<PadIncrementSelectorProps> = ({ value, onCh
         
         <View style={styles.valueContainer}>
           <Text style={styles.value}>+{value}</Text>
-          <Text style={styles.unit}>pad{value !== 1 ? 's' : ''}</Text>
+          <Text style={styles.unit}>ปุ่ม{value !== 1 ? 's' : ''}</Text>
         </View>
         
         <TouchableOpacity
@@ -85,18 +82,13 @@ const PadIncrementSelector: React.FC<PadIncrementSelectorProps> = ({ value, onCh
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 24,
+    marginBottom: 16,
   },
   label: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
     color: '#333',
-    marginBottom: 4,
-  },
-  description: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 16,
+    marginBottom: 10,
   },
   selectorContainer: {
     flexDirection: 'row',

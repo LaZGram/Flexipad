@@ -1,0 +1,51 @@
+{
+  "mode": "pattern",
+  "padIncrementPerLevel": 1,
+  "mistakeBehavior": "restart",
+  "levelPatterns": [
+    {
+      "level": 1,
+      "pattern": [0],
+      "description": "Level 1: Just pad 1"
+    },
+    {
+      "level": 2,
+      "pattern": [1, 0],
+      "description": "Level 2: Pad 2, then pad 1"
+    },
+    {
+      "level": 3,
+      "pattern": [2, 1, 0],
+      "description": "Level 3: Pad 3, pad 2, pad 1"
+    },
+    {
+      "level": 4,
+      "pattern": [0, 1, 2, 0],
+      "description": "Level 4: Pad 1, pad 2, pad 3, pad 1"
+    },
+    {
+      "level": 5,
+      "pattern": [2, 0, 1, 2, 0],
+      "description": "Level 5: Complex pattern with 5 steps"
+    }
+  ],
+  "patternSettings": {
+    "initialSequenceLength": 1,
+    "maxSequenceLength": 10,
+    "stepTimingMs": 300,
+    "showPatternDurationMs": 600,
+    "inputTimeoutMs": 3000
+  },
+  "gameSettings": {
+    "soundEnabled": true,
+    "vibrationEnabled": true,
+    "difficulty": "medium",
+    "repeatCount": 1
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "createdDate": "2025-12-18",
+    "description": "Level-Based Pattern Training - Progressive Difficulty",
+    "author": "Training System"
+  }
+}

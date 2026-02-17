@@ -3,6 +3,14 @@ import { useState, useRef, useCallback } from 'react';
 export type PadColor = 'red' | 'green' | 'off';
 export type GameState = 'idle' | 'running' | 'finished';
 
+export interface PressRecord {
+  pressNumber: number; // sequential press number
+  color: PadColor; // color of the pad pressed (red or green)
+  result: 'hit' | 'miss'; // hit = correct action, miss = wrong action
+  reactionTime: number; // time taken to press (0 if timeout/miss on green)
+  timestamp: number; // when the press occurred
+}
+
 export interface ForbiddenColorGameConfig {
   redProbability: number; // 0.0 to 1.0 (e.g., 0.3 = 30% chance of red)
   redDisplayDuration: number; // milliseconds to show red light
@@ -21,6 +29,8 @@ export interface GameStats {
   sessionStartTime: number; // timestamp when session started
   remainingTime: number; // remaining session time in seconds
   averageReactionTime: number; // average reaction time for green hits
+  pressTimes: number[]; // individual reaction times for each successful press
+  pressRecords: PressRecord[]; // detailed record of all presses
 }
 
 export interface GameRound {
@@ -45,11 +55,11 @@ export interface ForbiddenColorGameHook {
 
 const DEFAULT_CONFIG: ForbiddenColorGameConfig = {
   redProbability: 0.3,
-  redDisplayDuration: 1000, // Increased to 1 second for better visibility
-  greenTimeout: 1000,
+  redDisplayDuration: 800, // Reduced from 1000ms to 800ms for speed testing
+  greenTimeout: 3000, // Keep at 3s for green (user needs time to respond)
   enableGreenTimeout: true,
   totalPads: 3,
-  sessionTimeLimit: 60, // 1 minute default
+  sessionTimeLimit: 10, // 1 minute default
   roundTimeLimit: 1000, // 1 second max per round
 };
 
@@ -61,6 +71,8 @@ const INITIAL_STATS: GameStats = {
   sessionStartTime: 0,
   remainingTime: 0,
   averageReactionTime: 0,
+  pressTimes: [],
+  pressRecords: [],
 };
 
 export const useForbiddenColorGame = (
@@ -94,20 +106,33 @@ export const useForbiddenColorGame = (
     }
   }, []);
 
-  const updateStats = useCallback((hit: boolean, reactionTime?: number) => {
+  const updateStats = useCallback((hit: boolean, color: PadColor, reactionTime?: number) => {
     setStats(prev => {
       const newHitCount = hit ? prev.hitCount + 1 : prev.hitCount;
       const newMissCount = hit ? prev.missCount : prev.missCount + 1;
       const newTotal = prev.totalRounds + 1;
       const newAccuracy = newTotal > 0 ? (newHitCount / (newHitCount + newMissCount)) * 100 : 0;
       
-      // Update average reaction time for hits
+      // Update press times array and average reaction time
+      // Count any actual press with reaction time (exclude timeouts where reactionTime = 0)
+      let newPressTimes = [...prev.pressTimes];
       let newAvgReactionTime = prev.averageReactionTime;
-      if (hit && reactionTime) {
-        const totalHits = newHitCount;
-        const previousTotal = (totalHits - 1) * prev.averageReactionTime;
-        newAvgReactionTime = totalHits > 0 ? (previousTotal + reactionTime) / totalHits : 0;
+      if (reactionTime && reactionTime > 0) {
+        newPressTimes.push(reactionTime);
+        const totalValidPresses = newPressTimes.length;
+        const previousTotal = (totalValidPresses - 1) * prev.averageReactionTime;
+        newAvgReactionTime = totalValidPresses > 0 ? (previousTotal + reactionTime) / totalValidPresses : 0;
       }
+      
+      // Create detailed press record
+      const pressRecord: PressRecord = {
+        pressNumber: prev.pressRecords.length + 1,
+        color: color,
+        result: hit ? 'hit' : 'miss',
+        reactionTime: reactionTime || 0,
+        timestamp: Date.now(),
+      };
+      const newPressRecords = [...prev.pressRecords, pressRecord];
 
       return {
         hitCount: newHitCount,
@@ -117,6 +142,8 @@ export const useForbiddenColorGame = (
         sessionStartTime: prev.sessionStartTime,
         remainingTime: prev.remainingTime,
         averageReactionTime: parseFloat(newAvgReactionTime.toFixed(0)),
+        pressTimes: newPressTimes,
+        pressRecords: newPressRecords,
       };
     });
   }, []);
@@ -170,8 +197,8 @@ export const useForbiddenColorGame = (
     currentRoundRef.current = null;
     setCurrentRound(null);
 
-    // Use Promise-based delay instead of setTimeout to avoid race conditions
-    await new Promise(resolve => setTimeout(resolve, 100)); // 0.1 second delay
+    // Minimal delay between rounds - reduced from 100ms to 20ms for speed testing
+    await new Promise(resolve => setTimeout(resolve, 20)); // 20ms delay
     
     // Final validation before starting next round
     if (gameLoopRef.current) {
@@ -228,7 +255,7 @@ export const useForbiddenColorGame = (
         // Validate this timeout is for the current round
         if (gameLoopRef.current && currentRoundRef.current?.timestamp === nextRound.timestamp) {
           console.log('🔴 Red timeout triggered - correct behavior (HIT)');
-          updateStats(true); // Not pressing red = correct behavior = HIT
+          updateStats(true, 'red', 0); // Not pressing red = correct behavior = HIT
           await endCurrentRound();
         } else {
           console.log('🔴 Red timeout triggered but round changed - ignoring');
@@ -236,21 +263,25 @@ export const useForbiddenColorGame = (
       }, redTimeout);
     } else if (nextRound.color === 'green') {
       // Green light: timeout based on settings
-      const timeout = config.enableGreenTimeout 
-        ? Math.min(config.greenTimeout, config.roundTimeLimit)
-        : config.roundTimeLimit;
-      
-      console.log(`🟢 Setting GREEN timeout for ${timeout}ms (${timeout/1000}s)`);
-      timeoutRef.current = setTimeout(async () => {
-        // Validate this timeout is for the current round
-        if (gameLoopRef.current && currentRoundRef.current?.timestamp === nextRound.timestamp) {
-          console.log('🟢 Green timeout triggered - failed to respond (MISS)');
-          updateStats(false); // Failed to press green = incorrect behavior = MISS
-          await endCurrentRound();
-        } else {
-          console.log('🟢 Green timeout triggered but round changed - ignoring');
-        }
-      }, timeout);
+      if (config.enableGreenTimeout) {
+        const timeout = Math.min(config.greenTimeout, config.roundTimeLimit);
+        
+        console.log(`🟢 Setting GREEN timeout for ${timeout}ms (${timeout/1000}s)`);
+        timeoutRef.current = setTimeout(async () => {
+          // Validate this timeout is for the current round
+          if (gameLoopRef.current && currentRoundRef.current?.timestamp === nextRound.timestamp) {
+            console.log('🟢 Green timeout triggered - failed to respond (MISS)');
+            updateStats(false, 'green', 0); // Failed to press green = incorrect behavior = MISS
+            await endCurrentRound();
+          } else {
+            console.log('🟢 Green timeout triggered but round changed - ignoring');
+          }
+        }, timeout);
+      } else {
+        console.log('🟢 Green timeout is DISABLED - green will stay on until pressed');
+        // When timeout is disabled, green stays on indefinitely (no timeout)
+        // The round will only end when the user presses the pad
+      }
     }
     
     console.log(`✅ Round setup complete - LED sent, timeout set for round ${nextRound.timestamp}`);
@@ -297,7 +328,7 @@ export const useForbiddenColorGame = (
       sessionTimerRef.current = setTimeout(updateTimer, 1000);
     }
     
-    // Start first round after short delay
+    // Start first round with minimal delay - reduced from 1000ms to 100ms for speed testing
     setTimeout(() => {
       if (gameLoopRef.current) {
         console.log('🎬 Starting first round...');
@@ -305,7 +336,7 @@ export const useForbiddenColorGame = (
       } else {
         console.log('⚠️ Game stopped before first round could start');
       }
-    }, 1000);
+    }, 100);
   }, [config.sessionTimeLimit, startNextRound]);
 
   const stopGame = useCallback(async () => {
@@ -355,7 +386,7 @@ export const useForbiddenColorGame = (
 
     // Check if the round is too fresh (prevent immediate triggers)
     const roundAge = Date.now() - activeRound.timestamp;
-    if (roundAge < 200) { // Increased from 100ms to 200ms
+    if (roundAge < 50) { // Reduced from 200ms to 50ms for speed testing
       console.log(`⏱️ Round too fresh (${roundAge}ms old), ignoring button press`);
       return;
     }
@@ -377,12 +408,12 @@ export const useForbiddenColorGame = (
     if (activeRound.color === 'red') {
       // Pressed forbidden red pad - miss!
       console.log('🔴 Red pad pressed - MISS!');
-      updateStats(false);
+      updateStats(false, 'red', reactionTime);
       await endCurrentRound();
     } else if (activeRound.color === 'green') {
       // Pressed correct green pad - hit!
       console.log('🟢 Green pad pressed - HIT!');
-      updateStats(true, reactionTime);
+      updateStats(true, 'green', reactionTime);
       await endCurrentRound();
     }
   }, [gameState, updateStats, endCurrentRound]);

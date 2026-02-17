@@ -1,7 +1,16 @@
+// Individual level pattern configuration
+export interface LevelPattern {
+  level: number;
+  pattern: number[]; // Array of pad indices (0-based)
+  description?: string;
+}
+
 export interface PatternModeConfig {
   mode: "pattern";
   padIncrementPerLevel: number;
   mistakeBehavior: "restart" | "continue";
+  // Optional: Level-based patterns (if provided, overrides automatic generation)
+  levelPatterns?: LevelPattern[];
   patternSettings: {
     initialSequenceLength: number;
     maxSequenceLength: number;
@@ -12,7 +21,6 @@ export interface PatternModeConfig {
   gameSettings: {
     soundEnabled: boolean;
     vibrationEnabled: boolean;
-    difficulty: "easy" | "medium" | "hard";
     repeatCount: number;
   };
   metadata: {
@@ -34,6 +42,7 @@ export interface PatternModeState {
   inputTimeoutMs: number;
   soundEnabled: boolean;
   vibrationEnabled: boolean;
-  difficulty: "easy" | "medium" | "hard";
   repeatCount: number;
+  // Optional: Pre-defined patterns for each level
+  levelPatterns?: LevelPattern[];
 }

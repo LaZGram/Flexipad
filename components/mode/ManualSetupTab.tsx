@@ -35,11 +35,11 @@ const ManualSetupTab: React.FC<ManualSetupTabProps> = ({
 	return (
 		<View style={{ paddingHorizontal: 25, paddingTop: 20 }}>
 			<ModeOption
-				mode_type="Light Out"
+				mode_type="การดับไฟ"
 				mode_selected={lightOutData.lightOut}
 				set_mode_selected={onLightOutSelect}
 				options={["Hit", "Timeout", "Hit or Timeout"]}
-				description="Set the light out conditions"
+				description="ตั้งค่าเงื่อนไขการดับไฟ"
 				icon_name="light"
 				render_additional_options={() => (
 					<LightOutOptions 
@@ -50,11 +50,11 @@ const ManualSetupTab: React.FC<ManualSetupTabProps> = ({
 			/>
 
 			<ModeOption
-				mode_type="Light Delay"
+				mode_type="ดีเลย์ไฟ"
 				mode_selected={lightDelayData.lightDelay}
 				set_mode_selected={onLightDelaySelect}
 				options={["None", "Fixed", "Random"]}
-				description="Set the light delay settings"
+				description="ตั้งค่าดีเลย์ไฟ"
 				icon_name="light"
 				render_additional_options={() => (
 					<LightDelayOptions 
@@ -65,11 +65,11 @@ const ManualSetupTab: React.FC<ManualSetupTabProps> = ({
 			/>
 
 			<ModeOption
-				mode_type="Duration"
+				mode_type="เงื่อนไขการจบ"
 				mode_selected={durationData.duration}
 				set_mode_selected={onDurationSelect}
 				options={["Hit", "Timeout", "Hit or Timeout"]}
-				description="Set the duration parameters"
+				description="ตั้งค่าพารามิเตอร์เงื่อนไขในการฝึก"
 				icon_name="time"
 				render_additional_options={() => (
 					<DurationOptions 

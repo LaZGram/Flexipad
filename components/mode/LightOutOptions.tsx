@@ -18,12 +18,12 @@ const LightOutOptions: React.FC<LightOutOptionsProps> = ({
 			<View style={styles.slider_container}>
 				<View style={styles.dropdown_full_section}>
 					<Text style={styles.slider_label}>
-						Timeout: {lightOutData.timeout} seconds
+						หมดเวลา: {lightOutData.timeout} วินาที
 					</Text>
 					<View style={styles.dropdown_container}>
 						<Dropdown
 							data={[1, 2, 3, 4, 5]}
-							placeholder="Select timeout"
+							placeholder="เลือกเวลาที่ต้องการให้ไฟดับ"
 							onSelect={(value: number) =>
 								onUpdate({ ...lightOutData, timeout: value })
 							}
@@ -40,12 +40,12 @@ const LightOutOptions: React.FC<LightOutOptionsProps> = ({
 					{/* Left side - Timeout Dropdown */}
 					<View style={styles.dropdown_half_section}>
 						<Text style={styles.slider_label}>
-							Timeout: {lightOutData.timeout} seconds
+							หมดเวลา: {lightOutData.timeout} วินาที
 						</Text>
 						<View style={styles.dropdown_container}>
 							<Dropdown
 								data={[1, 2, 3, 4, 5]}
-								placeholder="Select timeout"
+								placeholder="เลือกเวลาที่ต้องการให้ไฟดับ"
 								onSelect={(value: number) =>
 									onUpdate({ ...lightOutData, timeout: value })
 								}
@@ -56,12 +56,12 @@ const LightOutOptions: React.FC<LightOutOptionsProps> = ({
 					{/* Right side - Hit Count Dropdown */}
 					<View style={styles.dropdown_half_section}>
 						<Text style={styles.slider_label}>
-							Hit Count: {lightOutData.hitCount}
+							จำนวนการกด: {lightOutData.hitCount}
 						</Text>
 						<View style={styles.dropdown_container}>
 							<Dropdown
 								data={[1, 2, 3, 4, 5, 6]}
-								placeholder="Select hit count"
+								placeholder="เลือกจำนวนการกด"
 								onSelect={(value: number) =>
 									onUpdate({ ...lightOutData, hitCount: value })
 								}

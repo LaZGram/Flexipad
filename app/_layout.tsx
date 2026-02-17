@@ -11,6 +11,7 @@ import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { BleProvider } from "@/components/context/blecontext";
+import { ThemedText } from "@/components/ThemedText";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -36,7 +37,7 @@ export default function RootLayout() {
 			<ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
 				<Stack>
 					<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-					<Stack.Screen name="ForbiddenColorMode" options={{ headerShown: false }} />
+					{/* <Stack.Screen name="ForbiddenColorMode" options={{ headerShown: false }} /> */}
 					<Stack.Screen name="+not-found" />
 				</Stack>
 			</ThemeProvider>

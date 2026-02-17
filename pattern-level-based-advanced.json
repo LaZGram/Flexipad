@@ -1,0 +1,66 @@
+{
+  "mode": "pattern",
+  "padIncrementPerLevel": 2,
+  "mistakeBehavior": "continue",
+  "levelPatterns": [
+    {
+      "level": 1,
+      "pattern": [0],
+      "description": "Warmup: Single pad"
+    },
+    {
+      "level": 2,
+      "pattern": [1, 0],
+      "description": "Basic sequence"
+    },
+    {
+      "level": 3,
+      "pattern": [0, 1, 0],
+      "description": "Return pattern"
+    },
+    {
+      "level": 4,
+      "pattern": [2, 1, 0, 1],
+      "description": "Cross pattern"
+    },
+    {
+      "level": 5,
+      "pattern": [0, 2, 1, 2, 0],
+      "description": "Diamond pattern"
+    },
+    {
+      "level": 6,
+      "pattern": [1, 0, 2, 0, 1, 2],
+      "description": "Complex zigzag"
+    },
+    {
+      "level": 7,
+      "pattern": [2, 2, 1, 1, 0, 0, 1],
+      "description": "Double tap sequence"
+    },
+    {
+      "level": 8,
+      "pattern": [0, 1, 2, 0, 1, 2, 0, 1],
+      "description": "Repeating cycle pattern"
+    }
+  ],
+  "patternSettings": {
+    "initialSequenceLength": 1,
+    "maxSequenceLength": 15,
+    "stepTimingMs": 250,
+    "showPatternDurationMs": 500,
+    "inputTimeoutMs": 3000
+  },
+  "gameSettings": {
+    "soundEnabled": true,
+    "vibrationEnabled": true,
+    "difficulty": "hard",
+    "repeatCount": 1
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "createdDate": "2025-12-18",
+    "description": "Advanced Level-Based Pattern Training - Expert Mode",
+    "author": "Training System"
+  }
+}

@@ -16,11 +16,11 @@ const LightDelayOptions: React.FC<LightDelayOptionsProps> = ({
 		return (
 			<View style={styles.slider_container}>
 				<Text style={styles.slider_label}>
-					Delay: {lightDelayData.delaytime.toFixed(2)} seconds
+					ดีเลย์ไฟ: {lightDelayData.delaytime.toFixed(2)} วินาที
 				</Text>
 				<Dropdown
 					data={LIGHT_DELAY_OPTIONS}
-					placeholder="Select delay"
+					placeholder="เลือกดีเลย์"
 					onSelect={(value: number) =>
 						onUpdate({ ...lightDelayData, delaytime: value })
 					}
@@ -31,12 +31,12 @@ const LightDelayOptions: React.FC<LightDelayOptionsProps> = ({
 		return (
 			<View style={styles.slider_container}>
 				<Text style={styles.slider_label}>
-					Random Delay Range: {RANDOM_DELAY_RANGE[0]} -{" "}
-					{RANDOM_DELAY_RANGE[1]} seconds
+					ช่วงดีเลย์แบบสุ่ม: {RANDOM_DELAY_RANGE[0]} -{" "}
+					{RANDOM_DELAY_RANGE[1]} วินาที
 				</Text>
 				<Text style={styles.note}>
-					Light will appear randomly between {RANDOM_DELAY_RANGE[0]} and{" "}
-					{RANDOM_DELAY_RANGE[1]} seconds
+					ไฟจะปรากฏแบบสุ่มระหว่าง {RANDOM_DELAY_RANGE[0]} ถึง{" "}
+					{RANDOM_DELAY_RANGE[1]} วินาที
 				</Text>
 			</View>
 		);

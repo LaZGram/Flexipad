@@ -17,11 +17,11 @@ const DurationOptions: React.FC<DurationOptionsProps> = ({
 		return (
 			<View style={styles.slider_container}>
 				<Text style={styles.slider_label}>
-					Hit Count: {durationData.hitduration} hits
+					จำนวนครั้งที่ต้องตี: {durationData.hitduration} ครั้ง
 				</Text>
 				<Dropdown
 					data={HIT_COUNT_OPTIONS}
-					placeholder="Select number of hits"
+					placeholder="เลือกจำนวนครั้งที่ต้องตี"
 					onSelect={(value: number) =>
 						onUpdate({
 							...durationData,
@@ -38,7 +38,7 @@ const DurationOptions: React.FC<DurationOptionsProps> = ({
 		return (
 			<View style={styles.duration_container}>
 				<Text style={styles.slider_label}>
-					Duration: {durationData.minDuration}m {durationData.secDuration}s
+					ระยะเวลา: {durationData.minDuration} นาที {durationData.secDuration} วินาที
 				</Text>
 				<View style={styles.counter_container}>
 					<CounterInput
@@ -63,11 +63,11 @@ const DurationOptions: React.FC<DurationOptionsProps> = ({
 				{durationData.duration === "Hit or Timeout" && (
 					<>
 						<Text style={styles.slider_label}>
-							Hit Count: {durationData.hitduration}
+							จำนวนครั้งที่ต้องตี: {durationData.hitduration}
 						</Text>
 						<Dropdown
 							data={HIT_COUNT_OPTIONS}
-							placeholder="Select hit count"
+							placeholder="เลือกจำนวนครั้งที่ต้องตี"
 							onSelect={(value: number) =>
 								onUpdate({
 									...durationData,
@@ -105,6 +105,7 @@ const styles = StyleSheet.create({
 		fontSize: 14,
 		color: "#333",
 		marginBottom: 8,
+		marginTop: 5,
 	},
 	dropdown: {
 		backgroundColor: "#f0f0f0",

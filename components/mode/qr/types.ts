@@ -31,6 +31,10 @@ export interface QRConfigurationData {
         seconds: number;
       }; // Required for Timeout and Hit or Timeout
     };
+    roundPads?: Array<{
+      round: number; // Round number (1-based)
+      pad: number; // Pad number that will be active (1-based)
+    }>; // Optional: Define which pad activates in each round
   };
 }
 
@@ -57,7 +61,14 @@ export const EXAMPLE_QR_CONFIGS: QRConfigurationData[] = [
       duration: {
         mode: "Hit",
         hitCount: 10
-      }
+      },
+      roundPads: [
+        { round: 1, pad: 0 },
+        { round: 2, pad: 1 },
+        { round: 3, pad: 1 },
+        { round: 4, pad: 1 },
+        { round: 5, pad: 0 }
+      ]
     }
   },
   {
@@ -176,5 +187,12 @@ export const VALIDATION_RULES = {
       maxMinutes: 60,
       maxSeconds: 59
     }
+  },
+  roundPads: {
+    optional: true,
+    minRound: 1,
+    maxRound: 1000,
+    minPad: 1,
+    maxPad: 6
   }
 };

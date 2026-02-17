@@ -1,0 +1,76 @@
+{
+  "mode": "pattern",
+  "padIncrementPerLevel": 1,
+  "mistakeBehavior": "continue",
+  "levelPatterns": [
+    {
+      "level": 1,
+      "pattern": [0],
+      "description": "Start simple: Pad 1 only"
+    },
+    {
+      "level": 2,
+      "pattern": [0, 0],
+      "description": "Same pad twice"
+    },
+    {
+      "level": 3,
+      "pattern": [0, 1],
+      "description": "Two different pads"
+    },
+    {
+      "level": 4,
+      "pattern": [1, 0, 1],
+      "description": "Back and forth"
+    },
+    {
+      "level": 5,
+      "pattern": [0, 1, 2],
+      "description": "Three pads in order"
+    },
+    {
+      "level": 6,
+      "pattern": [2, 1, 0],
+      "description": "Reverse order"
+    },
+    {
+      "level": 7,
+      "pattern": [0, 2, 1, 0],
+      "description": "Four step pattern"
+    },
+    {
+      "level": 8,
+      "pattern": [1, 1, 2, 2, 0],
+      "description": "Pairs pattern"
+    },
+    {
+      "level": 9,
+      "pattern": [0, 1, 2, 1, 0, 1],
+      "description": "Six step challenge"
+    },
+    {
+      "level": 10,
+      "pattern": [2, 0, 1, 0, 2, 1, 0],
+      "description": "Final challenge: 7 steps"
+    }
+  ],
+  "patternSettings": {
+    "initialSequenceLength": 1,
+    "maxSequenceLength": 10,
+    "stepTimingMs": 400,
+    "showPatternDurationMs": 700,
+    "inputTimeoutMs": 4000
+  },
+  "gameSettings": {
+    "soundEnabled": true,
+    "vibrationEnabled": true,
+    "difficulty": "easy",
+    "repeatCount": 1
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "createdDate": "2025-12-18",
+    "description": "Beginner Level-Based Pattern Training - Gentle Progression",
+    "author": "Training System"
+  }
+}

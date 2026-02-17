@@ -9,17 +9,26 @@ export default function TabLayout() {
 		<IconPositionProvider>
 			<ModuleContextProvider>
 				<Tabs
-					screenOptions={{
+					screenOptions={({ route }) => {
+						// Hide certain tabs by route name (e.g., "ble")
+						const showedTabs = ["connection", "setting", "home"];
+						const isShowed = showedTabs.includes(route.name);
+
+						return {
 						tabBarActiveTintColor: "#2f95dc",
 						tabBarInactiveTintColor: "gray",
 						tabBarStyle: { backgroundColor: "#fff" },
 						headerShown: false,
+						tabBarItemStyle: {
+							display: isShowed ? "flex" : "none",
+						},
+						};
 					}}
 				>
 						<Tabs.Screen
 							name="home"
 							options={{
-								tabBarLabel: "Home",
+								tabBarLabel: "หน้าหลัก",
 								tabBarIcon: ({ color, size }) => (
 									<FontAwesome name="home" size={size} color={color} />
 								),
@@ -28,7 +37,7 @@ export default function TabLayout() {
 						<Tabs.Screen
 							name="connection"
 							options={{
-								tabBarLabel: "Connect",
+								tabBarLabel: "อุปกรณ์",
 								tabBarIcon: ({ color, size }) => (
 									<FontAwesome5 name="bluetooth" size={size} color={color} />
 								),
@@ -46,7 +55,7 @@ export default function TabLayout() {
 						<Tabs.Screen
 							name="setting"
 							options={{
-								tabBarLabel: "Settings",
+								tabBarLabel: "การตั้งค่า",
 								tabBarIcon: ({ color, size }) => (
 									<FontAwesome5 name="cog" size={size} color={color} />
 								),

@@ -69,13 +69,13 @@ const HomeScreen: React.FC = () => {
 				</Text>
 				<View style={styles.headerSection}>
 					{/* <Text style={styles.title}>Flexipad Training</Text> */}
-					<Text style={styles.subtitle}>Choose your training mode</Text>
+					<Text style={styles.subtitle}>เลือกโหมดการฝึกของคุณ</Text>
 				</View>
 			
 			<View style={styles.modesContainer}>
 				<GameModeCard
 					title="Reaction Training"
-					description="Test your speed and reflexes"
+					description="ทดสอบความเร็วและการตอบสนองของคุณ"
 					icon={
 						<MaterialIcons 
 							name="flash-on" 
@@ -88,7 +88,7 @@ const HomeScreen: React.FC = () => {
 
 				<GameModeCard
 					title="Pattern Memory"
-					description="Challenge your cognitive skills"
+					description="จำรูปแบบ ตีให้ถูก ทดสอบความจำคุณ"
 					icon={
 						<FontAwesome5 
 							name="brain" 
@@ -101,7 +101,7 @@ const HomeScreen: React.FC = () => {
 
 				<GameModeCard
 					title="Forbidden Color"
-					description="React to green, avoid red lights"
+					description="ตอบสนองต่อไฟสีเขียว และเลี่ยงไฟสีแดง"
 					icon={
 						<MaterialIcons 
 							name="block" 

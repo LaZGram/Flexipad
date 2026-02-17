@@ -17,6 +17,11 @@ export interface DurationData {
 	secDuration: number;
 }
 
+export interface RoundPadData {
+	round: number;
+	pad: number;
+}
+
 export interface ModeOptionProps {
 	mode_type: string;
 	mode_selected: string;
@@ -29,4 +34,4 @@ export interface ModeOptionProps {
 
 export const HIT_COUNT_OPTIONS = [5, 10, 15, 20, 25, 30, 50, 100];
 export const LIGHT_DELAY_OPTIONS = [0.3, 0.5, 0.8, 1.0, 1.5, 2.0]; // seconds
-export const RANDOM_DELAY_RANGE = [0.3, 3.0]; // min/max seconds
+export const RANDOM_DELAY_RANGE = [0, 1.0]; // min/max seconds

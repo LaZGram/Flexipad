@@ -22,7 +22,7 @@ const TabHeader: React.FC<TabHeaderProps> = ({ activeTab, onTabChange }) => {
 						activeTab === "manual" && styles.activeTabText,
 					]}
 				>
-					Manual Setup
+					ตั้งค่าด้วยตนเอง
 				</Text>
 			</TouchableOpacity>
 			
@@ -39,7 +39,7 @@ const TabHeader: React.FC<TabHeaderProps> = ({ activeTab, onTabChange }) => {
 						activeTab === "qr" && styles.activeTabText,
 					]}
 				>
-					Scan QR
+					โหลดชุดรูปแบบ
 				</Text>
 			</TouchableOpacity>
 		</View>
