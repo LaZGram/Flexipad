@@ -27,7 +27,7 @@ const ForbiddenColorModeScreen = () => {
           command = "wAAA"; // Red LED
           break;
         case 'green':
-          command = "AAEA"; // Green LED (G channel = 4, others = 0) 
+          command = "AP8A"; // Green LED (G channel = 4, others = 0) 
           break;
         case 'off':
           command = "AAAA"; // All LEDs off

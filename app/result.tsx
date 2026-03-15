@@ -11,6 +11,7 @@ import {
   Platform,
   ActivityIndicator,
   ScrollView,
+  TextInput,
 } from "react-native";
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -157,10 +158,13 @@ const FullResult = ({
   userHitCount: number;
   averageReactionTime: number;
   reaction_time: number[];
+  cycle_times: number[];
   missCount: number;
 }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [showNameModal, setShowNameModal] = useState(false);
+  const [playerName, setPlayerName] = useState("");
 
   // Helper to handle CSV export
   function calculateAverageReactionTime(times: number[]): number {
@@ -174,16 +178,27 @@ const FullResult = ({
     return 0; // Return 0 if no times available
   }
 
-  // Save to backend database
-  const handleSaveToDatabase = async () => {
+  // Show name input modal
+  const handleSaveClick = () => {
     if (isSaved) {
       Alert.alert('Already Saved', 'This session has already been saved.');
       return;
     }
+    setShowNameModal(true);
+  };
 
+  // Save to backend database
+  const handleSaveToDatabase = async () => {
+    if (!playerName.trim()) {
+      Alert.alert('Name Required', 'Please enter your name before saving.');
+      return;
+    }
+
+    setShowNameModal(false);
     setIsSaving(true);
     try {
       const sessionData = {
+        playerName: playerName.trim(),
         lightOutMode: lightOut,
         timeout: isTimeMode ? timeout : null,
         hitCount: isHitMode ? hitCount : null,
@@ -196,9 +211,12 @@ const FullResult = ({
         missCount: missCount,
         averageReactionTime: calculateAverageReactionTime(reaction_time),
         reactionTimes: reaction_time,
+        cycleTimes: cycle_times || [],
         hitPercentage: isHitMode && hitDuration > 0 ? Math.min((userHitCount / hitDuration) * 100, 100) : null,
         sessionDate: new Date().toISOString(),
       };
+
+      console.log('📤 Sending to backend:', JSON.stringify(sessionData, null, 2));
 
       // Save to backend
       const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.HIT_MODE_SESSIONS), {
@@ -414,7 +432,7 @@ const FullResult = ({
 
           <TouchableOpacity 
             style={[styles.button, styles.saveButton, isSaved && styles.disabledButton]} 
-            onPress={handleSaveToDatabase}
+            onPress={handleSaveClick}
             disabled={isSaving || isSaved}
           >
             {isSaving ? (
@@ -437,6 +455,45 @@ const FullResult = ({
           </ScrollView>
         </View>
       </View>
+
+      {/* Player Name Input Modal */}
+      <Modal
+        visible={showNameModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowNameModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.nameInputBox}>
+            <Text style={styles.nameInputTitle}>Enter Player Name</Text>
+            <TextInput
+              style={styles.nameInput}
+              placeholder="Your name"
+              value={playerName}
+              onChangeText={setPlayerName}
+              autoFocus={true}
+              maxLength={50}
+            />
+            <View style={styles.nameModalButtons}>
+              <TouchableOpacity
+                style={[styles.button, styles.cancelButton]}
+                onPress={() => {
+                  setShowNameModal(false);
+                  setPlayerName("");
+                }}
+              >
+                <Text style={styles.buttonText}>ยกเลิก</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.button, styles.confirmButton]}
+                onPress={handleSaveToDatabase}
+              >
+                <Text style={styles.buttonText}>ยืนยัน</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </Modal>
   );
 };
@@ -554,6 +611,49 @@ const styles = StyleSheet.create({
   disabledButton: {
     backgroundColor: "#9e9e9e",
     opacity: 0.6,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.7)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  nameInputBox: {
+    backgroundColor: "white",
+    borderRadius: 16,
+    padding: 24,
+    width: "80%",
+    maxWidth: 400,
+    alignItems: "center",
+  },
+  nameInputTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 16,
+    color: "#333",
+  },
+  nameInput: {
+    width: "100%",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  nameModalButtons: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    gap: 12,
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: "#9e9e9e",
+  },
+  confirmButton: {
+    flex: 1,
+    backgroundColor: "#4e54a3",
   },
 });
 

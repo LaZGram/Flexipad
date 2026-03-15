@@ -286,7 +286,7 @@ const StartGame = () => {
         await writeCharacteristic(
           connectedDevice[index].device,
           CHARACTERISTIC.LED,
-          "wAAA"
+          "AP8A"
         );
         const padTurnon = Date.now(); // Record time AFTER LED is on
         // Set first light time for accurate playTime calculation
@@ -402,7 +402,7 @@ const StartGame = () => {
         await writeCharacteristic(
           connectedDevice[index].device,
           CHARACTERISTIC.LED,
-          "wAAA"
+          "AP8A"
         );
         const padTurnon = Date.now(); // Record time AFTER LED is on
         // Set first light time for accurate playTime calculation
@@ -531,7 +531,7 @@ const StartGame = () => {
         await writeCharacteristic(
           connectedDevice[index].device,
           CHARACTERISTIC.LED,
-          "wAAA"
+          "AP8A"
         );
         const padTurnon = Date.now(); // Record time AFTER LED is on
 
@@ -618,7 +618,7 @@ const StartGame = () => {
         await writeCharacteristic(
           connectedDevice[index].device,
           CHARACTERISTIC.LED,
-          "wAAA"
+          "AP8A"
         );
         const padTurnon = Date.now(); // Record time AFTER LED is on
 

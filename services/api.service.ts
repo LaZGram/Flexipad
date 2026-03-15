@@ -40,6 +40,7 @@ export interface LevelStats {
 
 export interface PatternSessionRecord {
   _id: string;
+  playerName: string;
   sessionStartTime: number;
   sessionEndTime?: number;
   totalTimeSpent?: number;

@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { StyleSheet, ScrollView, Alert, TouchableOpacity } from 'react-native';
+import { StyleSheet, ScrollView, Alert, TouchableOpacity, Modal, View, Text, TextInput } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedView } from '@/components/ThemedView';
@@ -19,6 +19,8 @@ const OnePadGameplayScreen = () => {
   const [isSaving, setIsSaving] = useState<boolean>(false);
   const [lastSaveStatus, setLastSaveStatus] = useState<'success' | 'error' | null>(null);
   const [isSessionSaved, setIsSessionSaved] = useState<boolean>(false);
+  const [showNameInputModal, setShowNameInputModal] = useState(false);
+  const [playerName, setPlayerName] = useState('');
   const sessionStartTimeRef = useRef<number>(0);
 
   // LED command function
@@ -35,7 +37,7 @@ const OnePadGameplayScreen = () => {
           command = "wAAA";
           break;
         case 'green':
-          command = "AAEA";
+          command = "AP8A";
           break;
         case 'off':
           command = "AAAA";
@@ -76,14 +78,24 @@ const OnePadGameplayScreen = () => {
     }
   }, [params.config, updateConfig]);
 
-  // Save session to backend
-  const saveSessionToBackend = useCallback(async () => {
+  // Show name input modal before saving
+  const handleSaveClick = useCallback(() => {
     if (selectedPad === null || stats.totalRounds === 0) return;
     if (isSessionSaved) {
       Alert.alert('บันทึกแล้ว', 'เซสชันนี้ถูกบันทึกแล้ว');
       return;
     }
+    setShowNameInputModal(true);
+  }, [selectedPad, stats.totalRounds, isSessionSaved]);
 
+  // Save session to backend
+  const saveSessionToBackend = useCallback(async () => {
+    if (!playerName.trim()) {
+      Alert.alert('Name Required', 'Please enter your name before saving.');
+      return;
+    }
+
+    setShowNameInputModal(false);
     setIsSaving(true);
     setLastSaveStatus(null);
 
@@ -93,6 +105,7 @@ const OnePadGameplayScreen = () => {
         : 0;
 
       const sessionData = {
+        playerName: playerName.trim(),
         padId: selectedPad,
         hitCount: stats.hitCount,
         missCount: stats.missCount,
@@ -141,7 +154,7 @@ const OnePadGameplayScreen = () => {
     } finally {
       setIsSaving(false);
     }
-  }, [selectedPad, stats, config, isSessionSaved]);
+  }, [selectedPad, stats, config, isSessionSaved, playerName]);
 
   // Button monitoring
   const lastButtonPressTime = useRef<number>(0);
@@ -374,7 +387,7 @@ if (selectedPad === null) {
             {stats.totalRounds > 0 && !isSessionSaved && (
               <ThemedView 
                 style={[styles.button, styles.saveButton, isSaving && styles.disabledButton]}
-                onTouchEnd={!isSaving ? saveSessionToBackend : undefined}
+                onTouchEnd={!isSaving ? handleSaveClick : undefined}
               >
                 <ThemedText style={styles.buttonText}>
                   {isSaving ? 'กำลังบันทึก...' : '💾 บันทึกเซสชัน'}
@@ -392,6 +405,45 @@ if (selectedPad === null) {
           </ThemedView>
         )}
       </ThemedView>
+
+      {/* Player Name Input Modal */}
+      <Modal
+        visible={showNameInputModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowNameInputModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.nameInputContainer}>
+            <Text style={styles.nameInputTitle}>Enter Player Name</Text>
+            <TextInput
+              style={styles.nameInput}
+              placeholder="Your name"
+              value={playerName}
+              onChangeText={setPlayerName}
+              autoFocus={true}
+              maxLength={50}
+            />
+            <View style={styles.nameInputButtons}>
+              <TouchableOpacity
+                style={[styles.nameInputButton, styles.cancelButton]}
+                onPress={() => {
+                  setShowNameInputModal(false);
+                  setPlayerName('');
+                }}
+              >
+                <Text style={styles.nameInputButtonText}>ยกเลิก</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.nameInputButton, styles.confirmButton]}
+                onPress={saveSessionToBackend}
+              >
+                <Text style={styles.nameInputButtonText}>ยืนยัน</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ThemedView>
   );
 };
@@ -676,6 +728,59 @@ const styles = StyleSheet.create({
     color: '#e63946',
     textAlign: 'center',
     marginTop: 40,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  nameInputContainer: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 24,
+    width: '80%',
+    maxWidth: 400,
+    alignItems: 'center',
+  },
+  nameInputTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    color: '#333',
+  },
+  nameInput: {
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  nameInputButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    gap: 12,
+  },
+  nameInputButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  nameInputButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  cancelButton: {
+    backgroundColor: '#9e9e9e',
+  },
+  confirmButton: {
+    backgroundColor: '#4e54a3',
   },
 });
 

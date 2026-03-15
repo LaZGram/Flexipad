@@ -16,6 +16,7 @@ import { getApiUrl, API_CONFIG } from '@/config/api.config';
 
 interface GameSession {
   id: string;
+  playerName: string;
   date: string;
   lightOutMode: string;
   durationMode: string;
@@ -62,6 +63,7 @@ export default function HitModeHistoryScreen() {
       // Transform backend data to match frontend interface
       const transformedSessions = data.map((session: any) => ({
         id: session._id,
+        playerName: session.playerName || 'Unknown',
         date: session.sessionDate,
         lightOutMode: session.lightOutMode,
         durationMode: session.durationMode,
@@ -166,7 +168,10 @@ export default function HitModeHistoryScreen() {
                 activeOpacity={0.7}
               >
                 <View style={styles.sessionHeader}>
-                  <Text style={styles.sessionNumber}>เกมที่ #{sessions.length - index}</Text>
+                  <View>
+                    <Text style={styles.sessionNumber}>เกมที่ #{sessions.length - index}</Text>
+                    <Text style={styles.playerName}>👤 {session.playerName}</Text>
+                  </View>
                   <Text style={styles.sessionDate}>{formatDate(session.date)}</Text>
                 </View>
 
@@ -243,6 +248,10 @@ export default function HitModeHistoryScreen() {
                   {/* Game Configuration */}
                   <View style={styles.detailSection}>
                     <Text style={styles.detailSectionTitle}>การตั้งค่าเกม</Text>
+                    <View style={styles.configCard}>
+                      <Text style={styles.configSubtitle}>ผู้เล่น</Text>
+                      <Text style={styles.configValue}>👤 {selectedSession.playerName}</Text>
+                    </View>
                     <View style={styles.configCard}>
                       <Text style={styles.configSubtitle}>วันที่เซสชัน</Text>
                       <Text style={styles.configValue}>{formatDate(selectedSession.date)}</Text>
@@ -532,6 +541,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: '#4e54a3',
+  },
+  playerName: {
+    fontSize: 13,
+    color: '#666666',
+    marginTop: 4,
+    fontWeight: '500',
   },
   sessionDate: {
     fontSize: 12,

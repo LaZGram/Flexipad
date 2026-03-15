@@ -16,6 +16,7 @@ interface PressRecord {
 
 interface GameSession {
   id: string;
+  playerName?: string;
   date: string;
   duration: number;
   hits: number;
@@ -72,6 +73,7 @@ const ForbiddenColorHistoryScreen = () => {
       // Transform backend data to match our interface
       const transformedSessions = data.map((session: any) => ({
         id: session._id || session.id,
+        playerName: session.playerName || 'Unknown',
         date: session.createdAt || new Date().toISOString(),
         duration: session.sessionDuration || session.duration || 0,
         hits: session.hitCount || session.hits || 0,
@@ -202,7 +204,13 @@ const ForbiddenColorHistoryScreen = () => {
                 activeOpacity={0.7}
               >
                 <View style={styles.sessionHeader}>
-                  <Text style={styles.sessionNumber}>เกมที่ #{sessions.length - index}</Text>
+                  <View>
+                    <Text style={styles.sessionNumber}>เกมที่ #{sessions.length - index}</Text>
+                    <View style={styles.playerNameRow}>
+                      <MaterialIcons name="person" size={16} color="#666" />
+                      <Text style={styles.playerName}>{session.playerName || 'Unknown'}</Text>
+                    </View>
+                  </View>
                   <Text style={styles.sessionDate}>{formatDate(session.date)}</Text>
                 </View>
 
@@ -284,6 +292,10 @@ const ForbiddenColorHistoryScreen = () => {
                   <View style={styles.section}>
                     <Text style={styles.sectionTitle}>การตั้งค่าเกม</Text>
                     <View style={styles.configCard}>
+                      <View style={styles.configRow}>
+                        <Text style={styles.configLabel}>ผู้เล่น:</Text>
+                        <Text style={styles.configValue}>👤 {selectedSession.playerName || 'Unknown'}</Text>
+                      </View>
                       <View style={styles.configRow}>
                         <Text style={styles.configLabel}>แผ่นกดที่ใช้:</Text>
                         <Text style={styles.configValue}>{selectedSession.padsUsed}</Text>
@@ -506,6 +518,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: '#4e54a3',
+  },
+  playerNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 4,
+  },
+  playerName: {
+    fontSize: 13,
+    color: '#666666',
+    fontWeight: '500',
   },
   sessionDate: {
     fontSize: 12,

@@ -208,17 +208,23 @@ const PatternHistoryScreen: React.FC = () => {
               activeOpacity={0.7}
             >
               <View style={styles.cardHeader}>
-                <View style={styles.levelBadge}>
-                  <MaterialIcons name="emoji-events" size={20} color="#FFA500" />
-                  <ThemedText style={styles.levelText}>ระดับ {session.finalLevel}</ThemedText>
+                <View style={styles.playerNameContainer}>
+                  <MaterialIcons name="person" size={16} color="#666" />
+                  <ThemedText style={styles.playerNameText}>{session.playerName || 'Unknown'}</ThemedText>
                 </View>
-                <View style={[
-                  styles.modeBadge,
-                  session.gameMode === 'restart' ? styles.restartBadge : styles.continueBadge
-                ]}>
-                  <ThemedText style={styles.modeText}>
-                    {session.gameMode === 'restart' ? 'เริ่มใหม่' : 'เล่นต่อ'}
-                  </ThemedText>
+                <View style={styles.badgeContainer}>
+                  <View style={styles.levelBadge}>
+                    <MaterialIcons name="emoji-events" size={20} color="#FFA500" />
+                    <ThemedText style={styles.levelText}>ระดับ {session.finalLevel}</ThemedText>
+                  </View>
+                  <View style={[
+                    styles.modeBadge,
+                    session.gameMode === 'restart' ? styles.restartBadge : styles.continueBadge
+                  ]}>
+                    <ThemedText style={styles.modeText}>
+                      {session.gameMode === 'restart' ? 'เริ่มใหม่' : 'เล่นต่อ'}
+                    </ThemedText>
+                  </View>
                 </View>
               </View>
 
@@ -373,10 +379,24 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   cardHeader: {
+    flexDirection: 'column',
+    gap: 8,
+    marginBottom: 12,
+  },
+  playerNameContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  playerNameText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#666',
+  },
+  badgeContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
   },
   levelBadge: {
     flexDirection: 'row',

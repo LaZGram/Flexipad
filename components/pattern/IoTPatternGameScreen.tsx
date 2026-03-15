@@ -8,6 +8,7 @@ import {
   Dimensions,
   Modal,
   ScrollView,
+  TextInput,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -71,6 +72,8 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
   // Save status tracking
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'success' | 'error'>('idle');
   const [showSaveModal, setShowSaveModal] = useState(false);
+  const [showNameInputModal, setShowNameInputModal] = useState(false);
+  const [playerName, setPlayerName] = useState('');
   const completedSessionStatsRef = useRef<SessionStats | null>(null);
   
   // Game state with logging wrapper
@@ -232,8 +235,8 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
       // Map commands to actual BLE commands with proper colors
       switch (command) {
         case 'PATTERN_DISPLAY_ON':
-          // RED light for pattern display phase
-          await device.writeCharacteristic(CHARACTERISTIC.LED, "wAAA"); // Red LED
+          // BLUE light for pattern display phase
+          await device.writeCharacteristic(CHARACTERISTIC.LED, "AAD/"); // Red LED
           break;
         case 'PATTERN_DISPLAY_OFF':
         case 'LIGHT_OFF':
@@ -242,7 +245,7 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
           break;
         case 'CORRECT_FEEDBACK':
           // BLUE light for correct player input
-          await device.writeCharacteristic(CHARACTERISTIC.LED, "AAD/"); // Blue LED
+          await device.writeCharacteristic(CHARACTERISTIC.LED, "AP8A"); // Blue LED
           break;
         case 'ERROR_FEEDBACK':
           // Red blinking feedback for error
@@ -414,12 +417,13 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
   };
 
   // Save session statistics to backend (manual save)
-  const saveSessionToBackend = async (stats: SessionStats): Promise<boolean> => {
+  const saveSessionToBackend = async (stats: SessionStats, playerNameParam: string): Promise<boolean> => {
     try {
       setSaveStatus('saving');
       console.log('💾 Saving Pattern Mode session to backend...', stats);
       
       const response = await ApiService.savePatternSession({
+        playerName: playerNameParam,
         sessionStartTime: stats.sessionStartTime,
         sessionEndTime: stats.sessionEndTime,
         totalTimeSpent: stats.totalTimeSpent,
@@ -456,8 +460,19 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
   
   // Handle manual save button press
   const handleManualSave = async () => {
+    setShowNameInputModal(true);
+  };
+
+  // Confirm save with player name
+  const confirmSaveWithName = async () => {
+    if (!playerName.trim()) {
+      Alert.alert('Name Required', 'Please enter your name before saving.');
+      return;
+    }
+
     if (completedSessionStatsRef.current) {
-      await saveSessionToBackend(completedSessionStatsRef.current);
+      setShowNameInputModal(false);
+      await saveSessionToBackend(completedSessionStatsRef.current, playerName.trim());
     }
   };
   
@@ -1317,6 +1332,45 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
         </Modal>
       )}
 
+      {/* Player Name Input Modal */}
+      <Modal
+        visible={showNameInputModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowNameInputModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.nameInputContainer}>
+            <Text style={styles.nameInputTitle}>Enter Player Name</Text>
+            <TextInput
+              style={styles.nameInput}
+              placeholder="Your name"
+              value={playerName}
+              onChangeText={setPlayerName}
+              autoFocus={true}
+              maxLength={50}
+            />
+            <View style={styles.nameInputButtons}>
+              <TouchableOpacity
+                style={[styles.nameInputButton, styles.cancelButton]}
+                onPress={() => {
+                  setShowNameInputModal(false);
+                  setPlayerName('');
+                }}
+              >
+                <Text style={styles.nameInputButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.nameInputButton, styles.confirmButton]}
+                onPress={confirmSaveWithName}
+              >
+                <Text style={styles.nameInputButtonText}>Confirm</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       {/* Game Controls */}
       <View style={styles.controlsSection}>
         {!gameState.isPlaying ? (
@@ -1742,6 +1796,53 @@ const styles = StyleSheet.create({
     gap: 8,
     borderTopWidth: 1,
     borderTopColor: '#e0e0e0',
+  },
+  nameInputContainer: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 24,
+    width: '80%',
+    maxWidth: 400,
+    alignItems: 'center',
+  },
+  nameInputTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    color: '#333',
+  },
+  nameInput: {
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  nameInputButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    gap: 12,
+  },
+  nameInputButton: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  nameInputButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  cancelButton: {
+    backgroundColor: '#9e9e9e',
+  },
+  confirmButton: {
+    backgroundColor: '#4e54a3',
   },
 });
 

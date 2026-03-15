@@ -19,7 +19,7 @@ import { Platform } from 'react-native';
 
 const getBaseUrl = (): string => {
   // For physical devices or when you know your local IP, use it directly
-  const LOCAL_IP = '172.20.10.3'; // Update this with your computer's IP
+  const LOCAL_IP = '10.31.62.42'; // Update this with your computer's IP
   
   if (Platform.OS === 'android') {
     // Android emulator: use 10.0.2.2
