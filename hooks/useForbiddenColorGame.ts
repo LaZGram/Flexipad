@@ -93,14 +93,12 @@ export const useForbiddenColorGame = (
 
   // Mock LED command function if none provided
   const mockSendLedCommand = useCallback(async (padId: number, color: PadColor) => {
-    console.log(`[MOCK] Pad ${padId + 1}: ${color}`);
   }, []);
 
   const sendLed = sendLedCommand || mockSendLedCommand;
 
   const clearCurrentTimeout = useCallback(() => {
     if (timeoutRef.current) {
-      console.log('🧹 Clearing current timeout');
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
@@ -158,13 +156,9 @@ export const useForbiddenColorGame = (
       throw new Error('No connected pads available for game');
     }
     
-    console.log(`🎮 Available pads for selection: [${connectedPads.join(', ')}]`);
-    
     const randomIndex = Math.floor(Math.random() * connectedPads.length);
     const padId = connectedPads[randomIndex];
     const isRed = Math.random() < config.redProbability;
-    
-    console.log(`🎯 Selected pad ${padId + 1} from available pads`);
     
     return {
       padId,
@@ -177,11 +171,8 @@ export const useForbiddenColorGame = (
   const endCurrentRound = useCallback(async () => {
     const activeRound = currentRoundRef.current;
     if (!activeRound) {
-      console.log('🛑 endCurrentRound called but no active round');
       return;
     }
-
-    console.log(`🏁 Ending round: Pad ${activeRound.padId + 1} - ${activeRound.color}`);
     
     // CRITICAL: Clear timeout FIRST to prevent race conditions
     clearCurrentTimeout();
@@ -202,28 +193,21 @@ export const useForbiddenColorGame = (
     
     // Final validation before starting next round
     if (gameLoopRef.current) {
-      console.log('⏭️ Starting next round after delay');
       await startNextRound(); // Make this await to ensure sequential execution
-    } else {
-      console.log('🛑 Game stopped, not starting next round');
     }
   }, [sendLed, clearCurrentTimeout]);
 
   const startNextRound = useCallback(async () => {
-    console.log(`🎮 startNextRound called - gameLoopRef: ${gameLoopRef.current}`);
     if (!gameLoopRef.current) {
-      console.log('🛑 Game loop stopped, aborting startNextRound');
       return;
     }
 
     // CRITICAL: Check if there's already an active round to prevent overlaps
     if (currentRoundRef.current && currentRoundRef.current.isActive) {
-      console.log('⚠️ Round already active, aborting startNextRound to prevent overlap');
       return;
     }
 
     const nextRound = generateNextRound();
-    console.log(`🎲 Generated next round: Pad ${nextRound.padId + 1} - ${nextRound.color}`);
     
     // CRITICAL: Clear any existing timeout before setting new round
     clearCurrentTimeout();
@@ -236,13 +220,10 @@ export const useForbiddenColorGame = (
     roundStartTimeRef.current = Date.now();
     
     // Turn on the pad with the appropriate color immediately
-    console.log(`💡 Sending ${nextRound.color} LED to pad ${nextRound.padId + 1}`);
-    console.log(`⏱️ ${nextRound.color} light will display for ${nextRound.color === 'red' ? config.redDisplayDuration : config.enableGreenTimeout ? Math.min(config.greenTimeout, config.roundTimeLimit) : config.roundTimeLimit}ms`);
     await sendLed(nextRound.padId, nextRound.color);
 
     // CRITICAL: Validate round is still active after LED command (prevent race conditions)
     if (!gameLoopRef.current || currentRoundRef.current?.timestamp !== nextRound.timestamp) {
-      console.log('⚠️ Game state changed during LED command, aborting timeout setup');
       return;
     }
 
@@ -250,15 +231,11 @@ export const useForbiddenColorGame = (
     if (nextRound.color === 'red') {
       // Red light: auto turn off after duration
       const redTimeout = config.redDisplayDuration;
-      console.log(`🔴 Setting RED timeout for ${redTimeout}ms (${redTimeout/1000}s)`);
       timeoutRef.current = setTimeout(async () => {
         // Validate this timeout is for the current round
         if (gameLoopRef.current && currentRoundRef.current?.timestamp === nextRound.timestamp) {
-          console.log('🔴 Red timeout triggered - correct behavior (HIT)');
           updateStats(true, 'red', 0); // Not pressing red = correct behavior = HIT
           await endCurrentRound();
-        } else {
-          console.log('🔴 Red timeout triggered but round changed - ignoring');
         }
       }, redTimeout);
     } else if (nextRound.color === 'green') {
@@ -266,37 +243,27 @@ export const useForbiddenColorGame = (
       if (config.enableGreenTimeout) {
         const timeout = Math.min(config.greenTimeout, config.roundTimeLimit);
         
-        console.log(`🟢 Setting GREEN timeout for ${timeout}ms (${timeout/1000}s)`);
         timeoutRef.current = setTimeout(async () => {
           // Validate this timeout is for the current round
           if (gameLoopRef.current && currentRoundRef.current?.timestamp === nextRound.timestamp) {
-            console.log('🟢 Green timeout triggered - failed to respond (MISS)');
             updateStats(false, 'green', 0); // Failed to press green = incorrect behavior = MISS
             await endCurrentRound();
-          } else {
-            console.log('🟢 Green timeout triggered but round changed - ignoring');
           }
         }, timeout);
       } else {
-        console.log('🟢 Green timeout is DISABLED - green will stay on until pressed');
         // When timeout is disabled, green stays on indefinitely (no timeout)
         // The round will only end when the user presses the pad
       }
     }
     
-    console.log(`✅ Round setup complete - LED sent, timeout set for round ${nextRound.timestamp}`);
   }, [generateNextRound, sendLed, endCurrentRound, config, updateStats, clearCurrentTimeout]);
 
   const startGame = useCallback(() => {
     // Prevent multiple starts
     if (gameLoopRef.current || gameState === 'running') {
-      console.log('⚠️ Game already running, ignoring start request');
       return;
     }
     
-    console.log('🚀 Starting Forbidden Color game...');
-    gameLoopRef.current = true;
-    console.log(`🔧 Set gameLoopRef to: ${gameLoopRef.current}`);
     
     const sessionStartTime = Date.now();
     setGameState('running');
@@ -317,7 +284,6 @@ export const useForbiddenColorGame = (
         setStats(prev => ({ ...prev, remainingTime: remaining }));
         
         if (remaining <= 0) {
-          console.log('⏰ Session time limit reached!');
           stopGame();
           return;
         }
@@ -331,10 +297,7 @@ export const useForbiddenColorGame = (
     // Start first round with minimal delay - reduced from 1000ms to 100ms for speed testing
     setTimeout(() => {
       if (gameLoopRef.current) {
-        console.log('🎬 Starting first round...');
         startNextRound();
-      } else {
-        console.log('⚠️ Game stopped before first round could start');
       }
     }, 100);
   }, [config.sessionTimeLimit, startNextRound]);
@@ -342,11 +305,9 @@ export const useForbiddenColorGame = (
   const stopGame = useCallback(async () => {
     // Prevent multiple stops
     if (!gameLoopRef.current && gameState === 'idle') {
-      console.log('⚠️ Game already stopped, ignoring stop request');
       return;
     }
     
-    console.log('Stopping Forbidden Color game...');
     
     // Immediately stop game loop to prevent any race conditions
     gameLoopRef.current = false;
@@ -372,7 +333,6 @@ export const useForbiddenColorGame = (
       await sendLed(padId, 'off');
     }
     
-    console.log('Game stopped and cleaned up');
   }, [clearCurrentTimeout, sendLed, config.totalPads, availablePadIds]);
 
   const handlePadPress = useCallback(async (padId: number) => {
@@ -380,39 +340,31 @@ export const useForbiddenColorGame = (
     const activeRound = currentRoundRef.current;
     
     if (gameState !== 'running' || !activeRound || !activeRound.isActive) {
-      console.log(`Pad press ignored - gameState: ${gameState}, activeRound: ${activeRound ? 'exists but inactive' : 'null'}`);
       return;
     }
 
     // Check if the round is too fresh (prevent immediate triggers)
     const roundAge = Date.now() - activeRound.timestamp;
     if (roundAge < 50) { // Reduced from 200ms to 50ms for speed testing
-      console.log(`⏱️ Round too fresh (${roundAge}ms old), ignoring button press`);
       return;
     }
 
     if (padId !== activeRound.padId) {
-      console.log(`Wrong pad pressed - expected pad ${activeRound.padId + 1}, got pad ${padId + 1}`);
       return;
     }
 
-    console.log(`🎯 Valid pad press detected: Pad ${padId + 1}, Actual Color: ${activeRound.color}`);
-    
     // CRITICAL: Mark round as inactive immediately to prevent multiple processing
     currentRoundRef.current = { ...activeRound, isActive: false };
     
     // Calculate reaction time
     const reactionTime = roundStartTimeRef.current > 0 ? Date.now() - roundStartTimeRef.current : 0;
-    console.log(`⚡ Reaction time: ${reactionTime}ms`);
 
     if (activeRound.color === 'red') {
       // Pressed forbidden red pad - miss!
-      console.log('🔴 Red pad pressed - MISS!');
       updateStats(false, 'red', reactionTime);
       await endCurrentRound();
     } else if (activeRound.color === 'green') {
       // Pressed correct green pad - hit!
-      console.log('🟢 Green pad pressed - HIT!');
       updateStats(true, 'green', reactionTime);
       await endCurrentRound();
     }

@@ -29,19 +29,14 @@ export default function Home() {
 	);
 	const [isCalibrating, setIsCalibrating] = React.useState(false);
 	const isCalibratingRef = React.useRef(isCalibrating);
-	console.log("Connected devices at start: ", connectedDevice);
 	React.useEffect(() => {
-		console.log("Connected devices: ", connectedDevice);
 		const moduleTemp: ConnectedDevice[] = [];
 		for (let i = 0; i < connectedDevice.length; i++) {
 			moduleTemp.push(connectedDevice[i]?.device as Device);
 		}
-		console.log("Module: ", moduleTemp);
 		setModule(moduleTemp);
 	}, [connectedDevice]);
-	console.log(connectedDevice);
 	const blink = async (device: Device) => {
-		console.log("Blinking");
 		let redLight = true;
 		const redColor = "/wAB";
 		const blueColor = "AAD/";
@@ -59,9 +54,7 @@ export default function Home() {
 	};
 
 	const oneBlink = async (device: Device) => {
-		console.log("=== One Blink - Starting measurement (100 times) ===");
 		const startTime = Date.now();
-		console.log(`[${startTime}] Command sent at: ${new Date(startTime).toISOString()}`);
 		
 		try {
 			let totalOnDelay = 0;
@@ -69,7 +62,6 @@ export default function Home() {
 			
 			// Repeat 100 times
 			for (let i = 0; i < 100; i++) {
-				console.log(`\n--- Blink ${i + 1}/100 ---`);
 				
 				// Turn on red LED
 				const commandSentTime = Date.now();
@@ -77,8 +69,6 @@ export default function Home() {
 				const commandCompleteTime = Date.now();
 				const commandDelay = commandCompleteTime - commandSentTime;
 				totalOnDelay += commandDelay;
-				
-				console.log(`[${commandCompleteTime}] ✓ Red LED ON - Command delay: ${commandDelay}ms`);
 				
 				// Wait 1000ms
 				await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -89,30 +79,17 @@ export default function Home() {
 				const offCommandCompleteTime = Date.now();
 				const offCommandDelay = offCommandCompleteTime - offCommandSentTime;
 				totalOffDelay += offCommandDelay;
-				
-				console.log(`[${offCommandCompleteTime}] ✓ LED OFF - Command delay: ${offCommandDelay}ms`);
 			}
 			
 			const totalTime = Date.now() - startTime;
 			const averageOnDelay = totalOnDelay / 100;
 			const averageOffDelay = totalOffDelay / 100;
 			const averageDelay = (totalOnDelay + totalOffDelay) / 200;
-			
-			console.log("\n=== One Blink - Measurement Complete ===");
-			console.log(`📊 Total time: ${totalTime}ms`);
-			console.log(`📊 Average ON command delay: ${averageOnDelay.toFixed(2)}ms`);
-			console.log(`📊 Average OFF command delay: ${averageOffDelay.toFixed(2)}ms`);
-			console.log(`📊 Overall average command delay: ${averageDelay.toFixed(2)}ms`);
-			console.log(`📊 Total blinks: 100`);
-			console.log("========================================");
 		} catch (error) {
-			console.error("❌ Error during one blink:", error);
+
 		}
 	};
 	const hit = async (device: Device) => {
-		console.log("=== Reaction Time Test - Starting ===");
-		console.log("💡 Light will turn on. Hit the pad as fast as you can!");
-		
 		try {
 			// Turn on red LED
 			await writeCharacteristic(device, CHARACTERISTIC.LED, "/wAB");
@@ -122,7 +99,6 @@ export default function Home() {
 			// Find the connected device wrapper to access button monitoring
 			const deviceWrapper = connectedDevice.find(d => d?.device.id === device.id);
 			if (!deviceWrapper) {
-				console.error("❌ Device not found in connected devices");
 				await writeCharacteristic(device, CHARACTERISTIC.LED, "AAAA");
 				return;
 			}
@@ -154,23 +130,15 @@ export default function Home() {
 			
 			if (buttonPressed) {
 				const reactionTime = hitTime - lightOnTime;
-				console.log(`[${hitTime}] 🎯 PAD HIT DETECTED!`);
-				console.log("=== Reaction Time Test - Complete ===");
-				console.log(`⚡ REACTION TIME: ${reactionTime}ms`);
-				console.log(`📊 Light on at: ${new Date(lightOnTime).toLocaleTimeString()}.${lightOnTime % 1000}`);
-				console.log(`📊 Hit detected at: ${new Date(hitTime).toLocaleTimeString()}.${hitTime % 1000}`);
-				console.log("====================================");
+
 			} else {
-				console.log("⏱️ Test timed out after 30 seconds");
 			}
 		} catch (error) {
-			console.error("❌ Error during reaction time test:", error);
 			// Make sure to turn off LED on error
 			await writeCharacteristic(device, CHARACTERISTIC.LED, "AAAA");
 		}
 	};
 	const playMusic = async (device: Device) => {
-		console.log("Playing music on device:", device.id);
 		await writeCharacteristic(
 			device, // Correct: pass Device object
 			CHARACTERISTIC.MUSIC, // Correct: characteristic first

@@ -37,7 +37,6 @@ const ForbiddenColorModeScreen = () => {
           return;
       }
 
-      console.log(`💡 [LED] Sending LED command to pad ${padId + 1}: ${color} (${command}) at ${Date.now()}`);
       await device.writeCharacteristic(CHARACTERISTIC.LED, command);
     } catch (error) {
       console.error(`Error sending LED command to pad ${padId + 1}:`, error);
@@ -48,7 +47,6 @@ const ForbiddenColorModeScreen = () => {
   const getConnectedPadIds = (): number[] => {
     if (!Array.isArray(connectedDevice)) {
       const fallback = [0, 1, 2];
-      console.log(`🔌 getConnectedPadIds: using fallback [${fallback.join(', ')}]`);
       return fallback; // Fallback to mock pads for testing
     }
     
@@ -56,7 +54,6 @@ const ForbiddenColorModeScreen = () => {
       .map((device: ConnectedDevice | null, index: number) => device ? index : -1)
       .filter((id: number) => id !== -1);
     
-    console.log(`🔌 getConnectedPadIds: returning [${result.join(', ')}]`);
     return result;
   };
 

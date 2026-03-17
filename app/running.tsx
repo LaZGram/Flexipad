@@ -19,7 +19,6 @@ import { ScreenHeight, ScreenWidth } from "@rneui/themed/dist/config";
 // const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 const SCREEN_WIDTH = Dimensions.get("window").width;
 const SCREEN_HEIGHT = Dimensions.get("window").height * 0.6; // -250 เพื่อทำให้ไม่ตกลงไปด้านล่าง
-// console.log(`witdth -> ${ScreenWidth}, height -> ${ScreenHeight}`);
 
 function ShowPad(props: any) {
 	const { connectedDevice } = useBleManager();
@@ -27,7 +26,6 @@ function ShowPad(props: any) {
 	const [module, setModule] = React.useState<Module[]>([]);
 
 	useEffect(() => {
-		console.log("ActivePadIndexRef updated:", props.activePadIndexRef);
 	}, [props.activePadIndexRef]); // Logs changes to activePadIndex
 
 	const clamp = (value: number, min: number, max: number) => {
@@ -44,24 +42,6 @@ function ShowPad(props: any) {
 		const dy = y1 - y2;
 		return Math.sqrt(dx * dx + dy * dy);
 	};
-	// const fixPostion = {
-	// 	// padindex 0 (L1)
-	// 	0: { x: SCREEN_WIDTH * 0.1, y: SCREEN_HEIGHT * 0.1 },
-	// 	// padindex 1 (R1)
-	// 	1: { x: SCREEN_WIDTH * 0.7, y: SCREEN_HEIGHT * 0.1 },
-	// 	// padindex 2 (L2)
-	// 	2: { x: SCREEN_WIDTH * 0.1, y: SCREEN_HEIGHT * 0.3 },
-	// 	// padindex 3 (R2)
-	// 	3: { x: SCREEN_WIDTH * 0.7, y: SCREEN_HEIGHT * 0.3 },
-	// 	// padindex 4 (L3)
-	// 	4: { x: SCREEN_WIDTH * 0.1, y: SCREEN_HEIGHT * 0.5 },
-	// 	// padindex 5 (R3)
-	// 	5: { x: SCREEN_WIDTH * 0.7, y: SCREEN_HEIGHT * 0.5 },
-	// 	// padindex 6 (L4)
-	// 	6: { x: SCREEN_WIDTH * 0.1, y: SCREEN_HEIGHT * 0.7 },
-	// 	// padindex 7 (R4)
-	// 	7: { x: SCREEN_WIDTH * 0.7, y: SCREEN_HEIGHT * 0.7 },
-	// };
 
 	const DeviceDraggable = ({
 		device,
@@ -102,7 +82,7 @@ function ShowPad(props: any) {
 			<View style={styles.draggableContainer}>
 				<TouchableOpacity
 					style={styles.touchable}
-					onPress={() => console.log("Pad pressed", pad_no)}
+					onPress={() => {}}
 				>
 					<MaterialIcons
 					name="wb-twilight"

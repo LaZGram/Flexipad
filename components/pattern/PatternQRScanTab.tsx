@@ -29,10 +29,8 @@ const PatternQRScanTab: React.FC<PatternQRScanTabProps> = ({ onConfigImport, onS
       setLoadingTemplates(true);
       setTemplatesError(null);
       const data = await ApiService.getPatternTemplates();
-      console.log('📦 Templates fetched from API:', JSON.stringify(data, null, 2));
       setTemplates(data);
     } catch (error) {
-      console.error('Error fetching templates:', error);
       setTemplatesError('Failed to load templates. Using offline mode.');
       // Fallback to local imports if API fails
       const sampleBeginner = require('../../pattern-level-based-beginner.json');
@@ -62,7 +60,6 @@ const PatternQRScanTab: React.FC<PatternQRScanTabProps> = ({ onConfigImport, onS
           config: sampleAdvanced,
         },
       ];
-      console.log('📦 Using fallback templates:', JSON.stringify(fallbackTemplates, null, 2));
       setTemplates(fallbackTemplates);
     } finally {
       setLoadingTemplates(false);
@@ -91,7 +88,6 @@ const PatternQRScanTab: React.FC<PatternQRScanTabProps> = ({ onConfigImport, onS
   };
 
   const handleTemplateClick = (template: PatternTemplate) => {
-    console.log('🔍 Template clicked:', JSON.stringify(template, null, 2));
     setSelectedTemplate(template);
     setShowDetailsModal(true);
   };
@@ -115,7 +111,6 @@ const PatternQRScanTab: React.FC<PatternQRScanTabProps> = ({ onConfigImport, onS
     const templateId = selectedTemplate.id;
     setSelectedTemplateId(templateId);
     setShowDetailsModal(false);
-    console.log('✅ Template selected:', templateId, 'selectedTemplate:', selectedTemplate);
   };
 
   const handleQRScan = (data: string) => {

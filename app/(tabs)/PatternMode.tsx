@@ -80,7 +80,6 @@ const PatternMode: React.FC = () => {
             onPress={handleViewHistory}
           >
             <MaterialIcons name="history" size={24} color="#fff" />
-            {/* <Text style={styles.historyButtonText}>ประวัติ</Text> */}
           </TouchableOpacity>
         </View>
       </View>
@@ -145,11 +144,6 @@ const styles = StyleSheet.create({
     color: '#ffffffff',
     marginBottom: 4,
   },
-  subtitle: {
-    fontSize: 14,
-    color: '#efefefff',
-    lineHeight: 20,
-  },
   historyButton: {
     flexDirection: 'column',
     alignItems: 'center',
@@ -159,12 +153,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 8,
     marginLeft: 12,
-  },
-  historyButtonText: {
-    color: '#fff',
-    fontSize: 10,
-    fontWeight: '600',
-    marginTop: 2,
   },
   content: {
     flex: 1,

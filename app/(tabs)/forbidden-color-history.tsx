@@ -60,7 +60,6 @@ const ForbiddenColorHistoryScreen = () => {
 
   const loadHistory = async () => {
     try {
-      console.log('📡 Fetching forbidden color history from backend...');
       const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.ONE_PAD_MODE_SESSIONS));
       
       if (!response.ok) {
@@ -68,7 +67,6 @@ const ForbiddenColorHistoryScreen = () => {
       }
       
       const data = await response.json();
-      console.log('✅ Loaded sessions:', data.length);
       
       // Transform backend data to match our interface
       const transformedSessions = data.map((session: any) => ({

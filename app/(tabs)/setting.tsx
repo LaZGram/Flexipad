@@ -113,7 +113,6 @@ const BLE = () => {
         }
       } else {
         // Connect
-        console.log("Connecting to device:", device.id);
         setModalText("Connecting...");
         setIsModalVisible(true);
         connectingDevicesRef.current.add(device.id);
@@ -131,7 +130,6 @@ const BLE = () => {
         );
       }
     } catch (error) {
-      console.log("Failed to connect/disconnect:", device.id, error);
       connectingDevicesRef.current.delete(device.id);
       forceUpdate((n) => n + 1);
       setIsModalVisible(false);
@@ -143,7 +141,6 @@ const BLE = () => {
    */
   const startScan = async () => {
     setDisconnectedDevice([]);
-    console.log("Scanning...");
     setScanning(true);
 
     scanForPeripherals();
@@ -151,12 +148,10 @@ const BLE = () => {
     setTimeout(() => {
       setScanning(false);
       stopDeviceScan();
-      console.log("Scan stopped after 10 seconds.");
     }, 10000);
   };
 
   useEffect(() => {
-    console.log("Connected devices state:", connectedDevice);
   }, [connectedDevice]);
 
   /**

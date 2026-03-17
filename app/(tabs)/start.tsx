@@ -62,17 +62,9 @@ const StartGame = () => {
   // const [forceStop, setForceStop] = useState(true);
   const forceStopRef = useRef(true);
   useEffect(() => {
-    console.log("✅ Updated reaction_time:", reaction_time);
-  }, [reaction_time]);
-  
-  // Sync ref with state changes
-  useEffect(() => {
     reactionTimeRef.current = reaction_time;
   }, [reaction_time]);
   
-  useEffect(() => {
-    console.log("✅ Updated avg_reaction_time:", averageReactionTime);
-  }, [averageReactionTime]);
   function calculateAverageReactionTime(times: number[]): number {
     // Filter out misses (marked as -1)
     const validTimes = times.filter(t => t >= 0);
@@ -95,7 +87,6 @@ const StartGame = () => {
   // function blink
   const blink = async (device: Device) => {
     try {
-      console.log("Blinking");
       let redLight = true;
       const redColor = "/wAB";
       const blueColor = "AAD/";
@@ -111,7 +102,6 @@ const StartGame = () => {
       // ปิดไฟ LED หลังจากกระพริบเสร็จ
       await writeCharacteristic(device, CHARACTERISTIC.LED, "AAAA");
     } catch (error) {
-      console.error("Error in blink:", error);
     }
   };
 
@@ -179,11 +169,6 @@ const StartGame = () => {
     hitCountRef.current = userHitCount;
   }, [userHitCount]);
 
-  // useEffect hook to log the userHitCount whenever it updates
-  useEffect(() => {
-    console.log(`Hit Count updated: ${userHitCount}`);
-  }, [userHitCount]);
-
   const isHitMode = lightOut === "Hit" || lightOut === "Hit or Timeout";
   const isTimeMode = lightOut === "Timeout" || lightOut === "Hit or Timeout";
   const isHitModeDur = duration === "Hit" || duration === "Hit or Timeout";
@@ -198,7 +183,6 @@ const StartGame = () => {
       if (roundConfig) {
         // Convert from 1-based pad number to 0-based index
         const padIndex = roundConfig.pad - 1;
-        console.log(`Round ${currentRound}: Using configured pad ${roundConfig.pad} (index ${padIndex})`);
         return padIndex;
       }
     }
@@ -212,9 +196,7 @@ const StartGame = () => {
     }
     while (activepad === randomIndex) {
       randomIndex = Math.floor(Math.random() * totalPads);
-      console.log("Random index :++++++++summmmm", randomIndex);
     }
-    console.log("Random index :++++++++ mai summ", randomIndex);
     return randomIndex;
   };
 
@@ -233,10 +215,8 @@ const StartGame = () => {
         return device.waitForButtonToBeTrue().then(() => {
           // Check if we should ignore this wrong pad press (correct pad was already pressed)
           if (cancelSignal.cancelled) {
-            console.log(`Wrong pad ${actualIndex} pressed but correct pad already detected - ignoring`);
             return new Promise(() => {}); // Never resolve
           }
-          console.log(`Wrong pad pressed! Expected pad ${correctPadIndex}, pressed pad ${actualIndex}`);
           // Don't increment miss count here - let the caller handle it
           return `wrong-pad-${actualIndex}`;
         });
@@ -257,13 +237,11 @@ const StartGame = () => {
       timeout - (Date.now() - startTime) > 0
     ) {
       if (forceStopRef.current) {
-        console.log("Force stop activated. Exiting the game.");
         return; // Exit the function immediately
       }
 
       const remainingTime = timeout - (Date.now() - startTime);
       if (remainingTime <= 0) {
-        console.log("Time is up. Exiting the loop.");
         break;
       }
 
@@ -271,15 +249,12 @@ const StartGame = () => {
         delaytime = randomTime();
       }
 
-      console.log("Remaining time:", remainingTime);
-
       try {
         const index = activateRandomPad(activepad, hitCount + 1);
         activepad = index;
         setActivePadIndex(index);
 
         if (hitCount >= hitduration && duration === "Hit or Timeout") {
-          console.log("Hit duration reached. Exiting the loop.");
           break;
         }
         
@@ -287,8 +262,6 @@ const StartGame = () => {
           connectedDevice[index].device,
           CHARACTERISTIC.LED,
           "AP8A"
-        );
-        const padTurnon = Date.now(); // Record time AFTER LED is on
         // Set first light time for accurate playTime calculation
         if (firstLightTimeRef.current === null) {
           firstLightTimeRef.current = padTurnon;
@@ -327,7 +300,6 @@ const StartGame = () => {
 
         // If wrong pad was pressed, continue waiting for correct pad or timeout
         if (typeof result === "string" && result.startsWith("wrong-pad")) {
-          console.log("Wrong pad detected, continuing to wait...");
           // Increment miss count for wrong pad press
           missCountRef.current++;
           setMissCount(missCountRef.current);
@@ -351,15 +323,10 @@ const StartGame = () => {
         reactionTimeRef.current = [...reactionTimeRef.current, reactionTime];
         setReaction_time([...reactionTimeRef.current]);
         
-        console.log(`✅ Reaction time: ${reactionTime.toFixed(3)}s`);
         await writeCharacteristic(
           connectedDevice[index].device,
           CHARACTERISTIC.LED,
           "AAAA"
-        );
-        console.log(
-          "---------------------------------------***** debug reaction time",
-          reaction_time
         );
         
         // Delay for the specified `delaytime`
@@ -368,25 +335,19 @@ const StartGame = () => {
         // Increment hit count
         hitCount++;
         setUserHitCount(hitCount);
-        console.log("Button hit successfully!");
       } catch (error) {
         if (error.message === "Force stop triggered") {
-          console.log(
-            "Force stop activated during button wait. Ending the game."
-          );
           return; // Exit the function immediately
         }
         if (error === "Timeout") {
-          console.log("Game timeout reached. Ending the game.");
+          
         }
-        console.error("An error occurred:", error);
       }
     }
 
     // "Hit" case
     while (duration === "Hit" && hitCount < hitduration) {
       if (forceStopRef.current) {
-        console.log("Force stop activated. Exiting the game.");
         return; // Exit the function immediately
       }
 
@@ -435,7 +396,6 @@ const StartGame = () => {
 
         // If wrong pad was pressed, continue waiting
         if (typeof result === "string" && result.startsWith("wrong-pad")) {
-          console.log("Wrong pad detected in Hit mode, continuing...");
           // Increment miss count for wrong pad press
           missCountRef.current++;
           setMissCount(missCountRef.current);
@@ -461,29 +421,19 @@ const StartGame = () => {
         setReaction_time([...reactionTimeRef.current]);
         setActivePadIndex(-1);
         
-        console.log(`✅ Hit reaction time: ${reactionTime.toFixed(3)}s`);
         await writeCharacteristic(
           connectedDevice[index].device,
           CHARACTERISTIC.LED,
           "AAAA"
         );
-        console.log(
-          "Button hit successfully! with reaction time:",
-          reaction_time
-        );
 
         await new Promise((resolve) => setTimeout(resolve, delaytime * 1000));
       } catch (error) {
         if (error.message === "Force stop triggered") {
-          console.log(
-            "Force stop activated during button wait. Ending the game."
-          );
           return; // Exit the function immediately
         }
         if (error === "Timeout") {
-          console.log("Duration Time out");
         }
-        console.error("An error occurred:", error);
       }
     }
 
@@ -507,7 +457,6 @@ const StartGame = () => {
     // Helper function to check forceStop
     const checkForceStop = () => {
       if (forceStopRef.current) {
-        console.log("Force stop triggered. Exiting game.");
         throw new Error("ForceStop");
       }
     };
@@ -578,10 +527,8 @@ const StartGame = () => {
         await new Promise((resolve) => setTimeout(resolve, delaytime * 1000));
       } catch (error) {
         if (error === "Timeout") {
-          console.log("Game timeout reached. Ending the game.");
           break; // Exit the loop if total game timeout is reached
         } else if (error === "Interval Timeout") {
-          console.log("Interval timeout reached (MISS). Moving to the next pad.");
           missCountRef.current++;
           setMissCount(missCountRef.current);
           const padTurnoff = Date.now();
@@ -597,10 +544,9 @@ const StartGame = () => {
 
           await new Promise((resolve) => setTimeout(resolve, delaytime * 1000));
         } else if (error === "ForceStop") {
-          console.log("Force stop triggered. Exiting game.");
           break; // Exit the loop immediately if forceStop is triggered
         } else {
-          console.error("An unexpected error occurred:", error);
+          
         }
       }
     }
@@ -642,7 +588,6 @@ const StartGame = () => {
         if (result === "Button Pressed") {
           hitCount++;
           setUserHitCount(hitCount);
-          console.log(`Hit count: ${hitCount} out of ${hitduration}`);
           setActivePadIndex(-1);
           const padTurnoff = Date.now();
           const reactionTime = (padTurnoff - padTurnon) / 1000;
@@ -657,7 +602,6 @@ const StartGame = () => {
             "AAAA"
           );
         } else if (result === "Interval Timeout") {
-          console.log("Interval timeout reached (MISS). Moving to the next pad.");
           missCountRef.current++;
           setMissCount(missCountRef.current);
           setActivePadIndex(-1);
@@ -675,14 +619,11 @@ const StartGame = () => {
         await new Promise((resolve) => setTimeout(resolve, delaytime * 1000));
       } catch (error) {
         if (error === "ForceStop") {
-          console.log("Force stop triggered. Exiting game.");
           break;
         }
-        console.error("An error occurred:", error);
       }
     }
     if (forceStopRef.current) {
-      console.log("Force stop triggered. Exiting playtimeout.");
       return;
     }
     setActivePadIndex(-1);
@@ -717,7 +658,6 @@ const StartGame = () => {
     let isstuck = false;
     const checkForceStop = () => {
       if (forceStopRef.current) {
-        console.log("Force stop triggered. Exiting game.");
         throw new Error("ForceStop");
       }
     };
@@ -773,7 +713,6 @@ const StartGame = () => {
 
         // If wrong pad was pressed, reset progress
         if (typeof result === "string" && result.startsWith("wrong-pad")) {
-          console.log("Wrong pad pressed in hitOrTimeout, resetting progress");
           // Increment miss count for wrong pad press
           missCountRef.current++;
           setMissCount(missCountRef.current);
@@ -798,7 +737,6 @@ const StartGame = () => {
 
           if (currentHitCounts >= hitCount) {
             isstuck = false;
-            console.log("Hit duration reached. Exiting the loop.");
             currentHitCounts = 0;
             setActivePadIndex(-1);
             const padTurnoff = Date.now();
@@ -823,9 +761,6 @@ const StartGame = () => {
       } catch (error) {
         if (error === "Interval Timeout") {
           isstuck = false;
-          console.log(
-            "Interval timeout reached (MISS). Moving to the next pad.---------------"
-          );
           missCountRef.current++;
           setMissCount(missCountRef.current);
           currentHitCounts = 0;
@@ -837,10 +772,8 @@ const StartGame = () => {
           );
           await new Promise((resolve) => setTimeout(resolve, delaytime * 1000));
         } else if (error === "ForceStop") {
-          console.log("Force stop triggered. Exiting game.");
           break; // Exit the loop immediately if forceStop is triggered
         } else {
-          console.error("An unexpected error occurred:", error);
         }
 
         // Ensure the pad's LED is turned off in case of an error
@@ -923,7 +856,6 @@ const StartGame = () => {
 
         // If wrong pad was pressed, reset progress
         if (typeof result === "string" && result.startsWith("wrong-pad")) {
-          console.log("Wrong pad pressed in hitOrTimeout timeout mode, resetting progress");
           // Increment miss count for wrong pad press
           missCountRef.current++;
           setMissCount(missCountRef.current);
@@ -948,7 +880,6 @@ const StartGame = () => {
 
           if (currentHitCounts >= hitCount) {
             isstuck = false;
-            console.log("Hit duration reached. Exiting the loop.");
             currentHitCounts = 0;
             setActivePadIndex(-1);
             const padTurnoff = Date.now();
@@ -973,9 +904,6 @@ const StartGame = () => {
       } catch (error) {
         if (error === "Interval Timeout") {
           isstuck = false;
-          console.log(
-            "Interval timeout reached (MISS). Moving to the next pad.---------------"
-          );
           missCountRef.current++;
           setMissCount(missCountRef.current);
           currentHitCounts = 0;
@@ -987,13 +915,10 @@ const StartGame = () => {
           );
           await new Promise((resolve) => setTimeout(resolve, delaytime * 1000));
         } else if (error === "Timeout") {
-          console.log("Game timeout reached. Ending the game.");
           break; // Exit the loop if total game timeout is reached
         } else if (error === "ForceStop") {
-          console.log("Force stop triggered. Exiting game.");
           break; // Exit the loop immediately if forceStop is triggered
         } else {
-          console.error("An unexpected error occurred:", error);
         }
 
         // Ensure the pad's LED is turned off in case of an error
@@ -1044,8 +969,6 @@ const StartGame = () => {
     setMissCount(0); // Reset miss count
     missCountRef.current = 0; // Reset miss count ref
     
-    console.log(`🎮 Starting new game - All states reset, Reaction times: []`);
-    
     // Reset all refs
     startTimeRef.current = Date.now();
     gameEndTimeRef.current = null;
@@ -1059,26 +982,17 @@ const StartGame = () => {
 
     if (lightOut === "Hit") {
       await play_hit(hit);
-      console.log("user hit count after game just end", hit);
     } else if (lightOut === "Timeout") {
       await play_timeout(hit, interval);
-      console.log("user hit count after game just end", hit);
     } else if (lightOut === "Hit or Timeout") {
       await play_hitOrTimeout(hit, interval);
-      console.log("user hit count after game just end", hit);
     }
     let endtime = Date.now();
     //setUserHitCount(hit); // Update the user's hit count
-    console.log(
-      "User hit count++++++++++++++++++++++++++++++///: ",
-      userHitCount
-    );
     
     // Use ref for immediate access to reaction times (state updates are async)
     const validReactionTimes = reactionTimeRef.current.filter(t => t >= 0);
     const totalReactionTime = reactionTimeRef.current.reduce((sum, time) => sum + Math.abs(time), 0);
-    console.log(`📊 Total reaction times: ${totalReactionTime.toFixed(3)}s (${validReactionTimes.length} hits, ${reactionTimeRef.current.length - validReactionTimes.length} misses)`);
-    console.log(`📊 Individual reaction times:`, reactionTimeRef.current.map((t, i) => t < 0 ? `Press ${i+1}: Miss (${Math.abs(t).toFixed(3)}s)` : `${t.toFixed(3)}s`));
     
     // Update state one final time to ensure it's current for the result modal
     setReaction_time([...reactionTimeRef.current]);
@@ -1091,10 +1005,6 @@ const StartGame = () => {
       ? endtime - firstLightTimeRef.current 
       : endtime - startTime;
     setPlayTime(actualPlayTime);
-    console.log(`📊 PlayTime calculated from first light: ${actualPlayTime}ms (${(actualPlayTime/1000).toFixed(3)}s)`);
-    console.log(`📊 Time difference: ${((actualPlayTime/1000) - totalReactionTime).toFixed(3)}s (delays + LED display time)`);
-    // setReaction_time([]);
-    console.log("game endeddddddd///////////////////////////////////////////");
   };
 
   return (
@@ -1178,16 +1088,8 @@ const StartGame = () => {
       <TouchableOpacity
         style={styles.playButton}
         onPress={() => {
-          console.log("Start Game button pressed.");
-          console.log("isPlaying-------------------------------", isPlaying);
-
           if (isPlaying) {
-            console.log("stop gameeeeeee...");
             forceStopRef.current = true;
-            console.log(
-              "force stop++++++++++++++++++++++++++++++++++++",
-              forceStopRef.current
-            );
             setIsPlaying(false);
             gameEndTimeRef.current = Date.now();
             setShowresult(true);
@@ -1198,10 +1100,6 @@ const StartGame = () => {
             });
             setPressButton(false);
           } else {
-            console.log(
-              "force stop++++++++++++++++++++++++++++++++++++0",
-              forceStopRef.current
-            );
             
             // Reset all game state before starting new game
             forceStopRef.current = false;
@@ -1213,8 +1111,6 @@ const StartGame = () => {
             setPlayTime(0); // Reset play time
             setaverageReactionTime(-1); // Reset average reaction time
             
-            console.log(`🔄 Game state reset - Reaction times cleared, Hit count: 0`);
-            
             // Reset all refs
             startTimeRef.current = Date.now();
             gameEndTimeRef.current = null;
@@ -1224,10 +1120,6 @@ const StartGame = () => {
             isHitRef.current = 1;
             isHitObjRef.current = [1, 1, 1, 1, 1, 1, 1, 1, 1];
             
-            console.log(
-              "force stop++++++++++++++++++++++++++++++++++++1",
-              forceStopRef.current
-            );
             setIsPlaying(true);
             play_2(
               (minDuration * 60 + secDuration) * 1000,

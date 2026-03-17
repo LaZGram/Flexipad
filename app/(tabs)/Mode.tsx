@@ -83,7 +83,6 @@ const ModeScreen: React.FC = () => {
 
 	const handle_qr_scan = () => {
 		// This is now handled within the QRScanTab component
-		console.log("QR Code scanning initiated");
 	};
 
 	const handle_config_import = (
@@ -101,8 +100,6 @@ const ModeScreen: React.FC = () => {
 		
 		// Switch to manual setup tab to show imported values
 		setActiveTab("manual");
-		
-		console.log("Configuration imported:", { lightOutData, lightDelayData, durationData, roundPads, metadata });
 	};
 
 	const handleViewHistory = () => {
@@ -130,9 +127,6 @@ const ModeScreen: React.FC = () => {
 			secDuration: duration_data.secDuration,
 			roundPads: round_pads,
 		});
-		console.log(
-			`go to the start page ${light_out_data.lightOut} ${light_out_data.hitCount} ${light_out_data.timeout} ${light_delay_data.lightDelay} ${light_delay_data.delaytime} ${duration_data.duration} ${duration_data.hitduration} ${duration_data.minDuration} ${duration_data.secDuration}`
-		);
 	};
 
 	return (

@@ -216,7 +216,6 @@ const FullResult = ({
         sessionDate: new Date().toISOString(),
       };
 
-      console.log('📤 Sending to backend:', JSON.stringify(sessionData, null, 2));
 
       // Save to backend
       const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.HIT_MODE_SESSIONS), {

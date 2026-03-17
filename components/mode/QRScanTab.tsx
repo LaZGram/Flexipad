@@ -41,10 +41,8 @@ const QRScanTab: React.FC<QRScanTabProps> = ({ onScanPress, onConfigImport }) =>
 			setLoadingTemplates(true);
 			setTemplatesError(null);
 			const data = await ApiService.getHitModeTemplates();
-			console.log('📦 Hit mode templates fetched from API:', JSON.stringify(data, null, 2));
 			setTemplates(data);
 		} catch (error) {
-			console.error('Error fetching hit mode templates:', error);
 			setTemplatesError('ไม่สามารถโหลดเทมเพลตจากเซิร์ฟเวอร์ได้');
 			
 			// Fallback to example template
@@ -82,7 +80,6 @@ const QRScanTab: React.FC<QRScanTabProps> = ({ onScanPress, onConfigImport }) =>
 				createdAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString()
 			}];
-			console.log('📦 Using fallback template');
 			setTemplates(fallbackTemplates);
 		} finally {
 			setLoadingTemplates(false);
@@ -90,7 +87,6 @@ const QRScanTab: React.FC<QRScanTabProps> = ({ onScanPress, onConfigImport }) =>
 	};
 
 	const handleTemplateClick = (template: HitTemplate) => {
-		console.log('🔍 Template clicked:', JSON.stringify(template, null, 2));
 		setSelectedTemplate(template);
 		setShowDetailsModal(true);
 	};
@@ -277,7 +273,6 @@ const QRScanTab: React.FC<QRScanTabProps> = ({ onScanPress, onConfigImport }) =>
 			[
 				{ text: 'คัดลอกไปยังคลิปบอร์ด', onPress: () => {
 					// In a real app, you'd use Clipboard.setString(jsonString)
-					console.log('Example QR JSON:', jsonString);
 				}},
 				{ text: 'ทดสอบการนำเข้า', onPress: () => handleQRScanned(jsonString) },
 				{ text: 'ยกเลิก' }

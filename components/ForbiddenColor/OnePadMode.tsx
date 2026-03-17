@@ -30,13 +30,10 @@ const OnePadMode: React.FC<OnePadModeProps> = ({ availablePads, sendLedCommand }
 
   const handlePadSelection = useCallback((padIndex: number) => {
     setSelectedPad(padIndex);
-    console.log(`📍 [One Pad] Selected pad ${padIndex + 1}`);
   }, []);
 
   const handleBlinkPad = useCallback(async () => {
     if (selectedPad === null) return;
-    
-    console.log(`💡 [One Pad] Blinking pad ${selectedPad + 1}...`);
     
     const colors: Array<'red' | 'green'> = ['red', 'green'];
     
@@ -47,7 +44,6 @@ const OnePadMode: React.FC<OnePadModeProps> = ({ availablePads, sendLedCommand }
     }
     
     await sendLedCommand(selectedPad, 'off');
-    console.log(`✅ [One Pad] Blink complete`);
   }, [selectedPad, sendLedCommand]);
 
   const handleStartGame = useCallback(() => {
@@ -56,7 +52,6 @@ const OnePadMode: React.FC<OnePadModeProps> = ({ availablePads, sendLedCommand }
       return;
     }
     
-    console.log(`🚀 [One Pad] Starting game on pad ${selectedPad + 1}`);
     router.push({
       pathname: '/one-pad-gameplay',
       params: { 

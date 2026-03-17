@@ -90,18 +90,15 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
     if (typeof update === 'function') {
       setGameStateRaw(prev => {
         const newState = update(prev);
-        console.log(`🔧 setState (function): pattern ${prev.currentPattern.join(',')} -> ${newState.currentPattern.join(',')}, step ${prev.currentStep} -> ${newState.currentStep}`);
         return newState;
       });
     } else {
-      console.log(`🔧 setState (direct): pattern -> [${update.currentPattern.join(',')}], step -> ${update.currentStep}`);
       setGameStateRaw(update);
     }
   }, []);
 
   // Add effect to monitor gameState changes
   useEffect(() => {
-    console.log(`🔍 GameState changed: isPlaying=${gameState.isPlaying}, level=${gameState.level}, currentStep=${gameState.currentStep}, pattern=[${gameState.currentPattern.join(', ')}], patternLength=${gameState.currentPattern.length}`);
   }, [gameState]);
 
   // Ref to track previous button states
@@ -134,7 +131,6 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
   // Play music/beep sound on all connected devices
   const playReadyBeep = async () => {
     try {
-      console.log('🔔 Playing "ready to start" beep on all pads');
       const promises = connectedDevice.map(async (device) => {
         if (device && device.device) {
           // Send music/beep signal
@@ -144,9 +140,7 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
         }
       });
       await Promise.all(promises);
-      console.log('🔔 Ready beep played successfully');
     } catch (error) {
-      console.error('Error playing ready beep:', error);
     }
   };
   
@@ -164,7 +158,6 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
   // Blink function for error feedback (adapted from start.tsx)
   const blinkPadError = async (device: ConnectedDevice) => {
     try {
-      console.log("Blinking error feedback");
       const redColor = "/wAB";
       const offColor = "AAAA";
       for (let i = 0; i < 6; i++) {
@@ -174,7 +167,6 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
         await new Promise((resolve) => setTimeout(resolve, 150));
       }
     } catch (error) {
-      console.error("Error in blink feedback:", error);
     }
   };
 
@@ -182,7 +174,6 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
   const getConnectedPadIds = (): number[] => {
     if (!Array.isArray(connectedDevice)) {
       const fallback = [0, 1, 2];
-      console.log(`🔌 getConnectedPadIds: using fallback [${fallback.join(', ')}]`);
       return fallback; // Fallback to mock pads for testing
     }
     
@@ -190,7 +181,6 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
       .map((device: ConnectedDevice | null, index: number) => device ? index : -1)
       .filter((id: number) => id !== -1);
     
-    console.log(`🔌 getConnectedPadIds: returning [${result.join(', ')}]`);
     return result;
   };
 
@@ -200,7 +190,6 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
     if (config.levelPatterns && config.levelPatterns.length > 0) {
       const levelPattern = config.levelPatterns.find(lp => lp.level === level);
       if (levelPattern) {
-        console.log(`📋 Using pre-defined pattern for level ${level}: [${levelPattern.pattern.join(', ')}]`);
         return levelPattern.pattern;
       }
     }
@@ -220,7 +209,6 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
       pattern.push(connectedPads[randomIndex]);
     }
     
-    console.log(`🎲 Generated random pattern for level ${level}: [${pattern.join(', ')}]`);
     return pattern;
   };
 
@@ -230,7 +218,6 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
     if (!device || !device.device) return;
 
     try {
-      console.log(`Sending command "${command}" to pad ${padIndex + 1}`);
       
       // Map commands to actual BLE commands with proper colors
       switch (command) {
@@ -253,22 +240,15 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
           break;
       }
     } catch (error) {
-      console.error(`Failed to send command to pad ${padIndex}:`, error);
     }
   };
 
   // Phase 1: Show pattern using RED lights
   const showPatternDisplay = async (pattern: number[]) => {
-    console.log(`\n=== PATTERN DISPLAY PHASE ===`);
-    console.log(`🔍 showPatternDisplay received pattern: [${pattern.join(', ')}] (length: ${pattern.length})`);
-    console.log(`🔍 Current gameState.currentPattern: [${gameState.currentPattern.join(', ')}] (length: ${gameState.currentPattern.length})`);
-    console.log(`Pattern array (0-based): [${pattern.join(', ')}]`);
-    console.log(`Showing pattern: [${pattern.map(p => `Pad ${p + 1}`).join(', ')}]`);
     
     // Show each pad in the pattern sequence with RED lights
     for (let i = 0; i < pattern.length; i++) {
       const padIndex = pattern[i];
-      console.log(`Step ${i + 1}/${pattern.length}: Lighting Pad ${padIndex + 1} in RED`);
       
       // Highlight this pad in the UI
       setDisplayingPadIndex(padIndex);
@@ -292,7 +272,6 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
     }
     
     // Ensure ALL LEDs are off before moving to input phase
-    console.log('Pattern display complete - turning off all LEDs');
     await turnOffAllPads();
     
     // Play "ready to start" beep
@@ -302,44 +281,17 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
     if (currentLevelStatsRef.current && currentLevelStatsRef.current.startTime === 0) {
       const newStartTime = Date.now();
       currentLevelStatsRef.current.startTime = newStartTime;
-      
-      // Update state to match
-      setSessionStats(prev => {
-        const updates: Partial<SessionStats> = {
-          levelStats: prev.levelStats.map(ls =>
-            ls.level === gameState.level
-              ? { ...ls, startTime: newStartTime }
-              : ls
-          ),
-        };
-        
-        // Also set sessionStartTime on first level
-        if (gameState.level === 1 && prev.sessionStartTime === 0) {
-          updates.sessionStartTime = newStartTime;
-        }
-        
-        return { ...prev, ...updates };
-      });
-      
-      console.log(`⏱️ Level timer started at ${newStartTime}`);
-    }
     
     // Brief pause before input phase (reduced from 500ms to 200ms)
     // await new Promise(resolve => setTimeout(resolve, 200));
     
-    console.log(`=== PLAYER INPUT PHASE ===`);
-    console.log(`Waiting for player to repeat pattern...`);
-    
     // Now activate input phase - this is when we start listening for button presses
     isInputPhaseActive.current = true;
-    console.log(`🎯 Input phase activated - ready for player input`);
     
     // Start 3-second timeout - if player doesn't press anything, count as miss
     inputTimeoutRef.current = setTimeout(() => {
-      console.log('⏰ 3-second timeout expired - counting as miss');
       handleInputTimeout();
     }, 3000);
-    console.log('⏰ Started 3-second input timeout');
   };
 
   // Turn off all connected pads
@@ -364,41 +316,6 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
     const newPattern = generatePattern(1);
     if (newPattern.length === 0) return;
 
-    console.log(`🎮 Starting game with pattern: [${newPattern.join(', ')}] -> [${newPattern.map(p => `Pad ${p + 1}`).join(', ')}]`);
-
-    // Initialize session statistics with startTime = 0 (will be set after first beep)
-    const initialLevelStats: LevelStats = {
-      level: 1,
-      startTime: 0, // Will be set after beep plays
-      accumulatedFailedTime: 0,
-      failureCount: 0,
-      completed: false,
-    };
-    
-    setSessionStats({
-      sessionStartTime: 0, // Will be set after first beep plays
-      levelStats: [initialLevelStats],
-      gameMode: config.mistakeBehavior === 'restart' ? 'restart' : 'continue',
-      finalLevel: 1,
-    });
-    
-    currentLevelStatsRef.current = initialLevelStats;
-
-    // Reset all button states and timing to prevent auto-play
-    previousButtonStates.current = new Array(9).fill(false);
-    lastButtonPressTime.current = new Array(9).fill(0);
-    isInputPhaseActive.current = false;
-    shouldContinueGame.current = true; // Enable game continuation
-    
-    // Initialize current button states to prevent false triggers
-    if (Array.isArray(connectedDevice)) {
-      connectedDevice.forEach((device, index) => {
-        if (device && device.device) {
-          previousButtonStates.current[index] = device.button || false;
-        }
-      });
-    }
-
     setGameState({
       isPlaying: true,
       level: 1,
@@ -410,7 +327,6 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
     // Start with pattern display phase (reduced delay for faster start)
     startGameTimeoutRef.current = setTimeout(async () => {
       // Don't check gameState.isPlaying here as it will use stale closure value
-      console.log(`🔄 About to display pattern: [${newPattern.join(', ')}]`);
       await showPatternDisplay(newPattern);
       // After pattern display, we wait for user input (no active lights)
     }, 10);
@@ -420,7 +336,6 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
   const saveSessionToBackend = async (stats: SessionStats, playerNameParam: string): Promise<boolean> => {
     try {
       setSaveStatus('saving');
-      console.log('💾 Saving Pattern Mode session to backend...', stats);
       
       const response = await ApiService.savePatternSession({
         playerName: playerNameParam,
@@ -432,7 +347,6 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
         finalLevel: stats.finalLevel,
       });
       
-      console.log('✅ Pattern Mode session saved successfully:', response);
       setSaveStatus('success');
       
       // Hide save modal after successful save
@@ -443,7 +357,6 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
       
       return true;
     } catch (error) {
-      console.error('❌ Error saving Pattern Mode session:', error);
       setSaveStatus('error');
       
       Alert.alert(
@@ -489,7 +402,6 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
   const stopGame = () => {
     // Disable game continuation immediately
     shouldContinueGame.current = false;
-    
     // Clear all timeouts
     if (inputTimeoutRef.current) {
       clearTimeout(inputTimeoutRef.current);
@@ -522,15 +434,12 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
     setSessionStats(prev => {
       const sessionEndTime = Date.now();
       
-      console.log('\n📊 === CALCULATING TOTAL TIME ===');
-      
       // Calculate total time including all failed attempts
       // Sum of: (successful level times + accumulated failed time for each level)
       const totalFromLevels = prev.levelStats.reduce((sum, ls) => {
         const successTime = ls.timeSpent || 0;
         const failedTime = ls.accumulatedFailedTime || 0;
         const levelTotal = successTime + failedTime;
-        console.log(`Level ${ls.level}: Success=${successTime}ms (${(successTime/1000).toFixed(2)}s), Failed=${failedTime}ms (${(failedTime/1000).toFixed(2)}s), Total=${levelTotal}ms (${(levelTotal/1000).toFixed(2)}s)`);
         return sum + successTime + failedTime;
       }, 0);
       
@@ -538,12 +447,9 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
       let currentLevelTime = 0;
       if (currentLevelStatsRef.current && !currentLevelStatsRef.current.completed && currentLevelStatsRef.current.startTime > 0) {
         currentLevelTime = sessionEndTime - currentLevelStatsRef.current.startTime;
-        console.log(`Current incomplete level time: ${currentLevelTime}ms (${(currentLevelTime/1000).toFixed(2)}s)`);
       }
       
       const totalTimeSpent = totalFromLevels + currentLevelTime;
-      console.log(`TOTAL TIME: ${totalTimeSpent}ms (${(totalTimeSpent/1000).toFixed(2)}s)`);
-      console.log('=================================\n');
       
       const finalStats = {
         ...prev,
@@ -551,9 +457,6 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
         totalTimeSpent,
         finalLevel: gameState.level,
       };
-      
-      // Log session statistics
-      console.log('📊 Session Statistics:', JSON.stringify(finalStats, null, 2));
       
       // Store stats for manual save and show save modal
       completedSessionStatsRef.current = finalStats;
@@ -571,7 +474,7 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
       connectedDevice.forEach((device: ConnectedDevice | null, index: number) => {
         if (device) {
           // Direct LED off command to avoid duplicate prevention
-          device.writeCharacteristic(CHARACTERISTIC.LED, "AAAA").catch(console.error);
+          device.writeCharacteristic(CHARACTERISTIC.LED, "AAAA");
         }
       });
     }
@@ -587,13 +490,11 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
 
   // Handle timeout when player doesn't press anything within 3 seconds
   const handleInputTimeout = async () => {
-    console.log('❌ INPUT TIMEOUT - Player did not respond within 3 seconds');
     
     // Capture failed attempt time IMMEDIATELY before any delays or animations
     let failedAttemptTime = 0;
     if (currentLevelStatsRef.current && currentLevelStatsRef.current.startTime > 0) {
       failedAttemptTime = Date.now() - currentLevelStatsRef.current.startTime;
-      console.log(`⏱️ Failed attempt time captured: ${failedAttemptTime}ms (${(failedAttemptTime/1000).toFixed(2)}s)`);
     }
     
     // Clear the timeout ref
@@ -616,8 +517,6 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
       // Update the ref to match (since it points to the same object)
       currentLevelStatsRef.current.failureCount = currentLevelStatsRef.current.failureCount + 1;
     }
-    
-    // Same logic as incorrect pad press - restart from Level 1
     isInputPhaseActive.current = false;
     
     // Blink error (all pads red)
@@ -649,12 +548,10 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
       currentLevelStatsRef.current.timeSpent = undefined;
       currentLevelStatsRef.current.accumulatedFailedTime = newAccumulatedTime;
       
-      console.log(`⏱️ Total accumulated failed time: ${newAccumulatedTime}ms (${(newAccumulatedTime/1000).toFixed(2)}s)`);
     }
     
     // Restart from Level 1 (game over behavior)
     const newPattern = generatePattern(1);
-    console.log(`🔄 Restarting from Level 1 due to timeout. New pattern: [${newPattern.join(', ')}]`);
     
     setGameState(prev => ({
       ...prev,
@@ -678,13 +575,9 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
     if (inputTimeoutRef.current) {
       clearTimeout(inputTimeoutRef.current);
       inputTimeoutRef.current = null;
-      console.log('⏰ Input timeout cleared due to button press');
     }
     
-    console.log(`🚨 HANDLEPADPRESS START: pressedPadIndex=${pressedPadIndex}, gameState.currentPattern=[${gameState.currentPattern.join(', ')}]`);
-    
     if (!gameState.isPlaying) {
-      console.log(`⚠️ Game not playing, ignoring pad press`);
       return;
     }
     
@@ -693,22 +586,14 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
     const currentStep = gameState.currentStep;
     
     if (currentPattern.length === 0) {
-      console.log(`⚠️ No pattern available, ignoring pad press`);
       return;
     }
     
-    const expectedPadIndex = currentPattern[currentStep];
     const stepDisplay = currentStep + 1;
     const totalSteps = currentPattern.length;
     
-    console.log(`\nPad ${pressedPadIndex + 1} pressed (Step ${stepDisplay}/${totalSteps})`);
-    console.log(`Pattern array: [${currentPattern.join(', ')}]`);
-    console.log(`Current step: ${currentStep}, Expected index: ${expectedPadIndex}, Pressed index: ${pressedPadIndex}`);
-    console.log(`Expected: Pad ${expectedPadIndex + 1}, Got: Pad ${pressedPadIndex + 1}`);
-    
     if (pressedPadIndex === expectedPadIndex) {
       // Correct pad pressed - give BLUE feedback
-      console.log(`✅ Correct! Giving BLUE feedback`);
       
       // Send BLUE light feedback
       await sendPadCommand(pressedPadIndex, 'CORRECT_FEEDBACK');
@@ -721,7 +606,6 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
       
       if (currentStep === currentPattern.length - 1) {
         // Pattern completed successfully!
-        console.log(`🎉 Pattern completed! Advancing to next level`);
         
         // Finalize current level stats
         if (currentLevelStatsRef.current) {
@@ -729,12 +613,6 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
           const startTime = currentLevelStatsRef.current.startTime;
           // Only calculate timeSpent if startTime was properly set (not 0)
           const timeSpent = startTime > 0 ? endTime - startTime : 0;
-          
-          console.log(`\n✅ Level ${gameState.level} completed!`);
-          console.log(`  Start: ${startTime}, End: ${endTime}`);
-          console.log(`  Success time: ${timeSpent}ms (${(timeSpent/1000).toFixed(2)}s)`);
-          console.log(`  Accumulated failed time: ${currentLevelStatsRef.current.accumulatedFailedTime}ms (${(currentLevelStatsRef.current.accumulatedFailedTime/1000).toFixed(2)}s)`);
-          console.log(`  Level total: ${timeSpent + currentLevelStatsRef.current.accumulatedFailedTime}ms (${((timeSpent + currentLevelStatsRef.current.accumulatedFailedTime)/1000).toFixed(2)}s)\n`);
           
           currentLevelStatsRef.current.endTime = endTime;
           currentLevelStatsRef.current.timeSpent = timeSpent;
@@ -768,20 +646,14 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
           setSessionStats(prev => {
             const sessionEndTime = Date.now();
             
-            console.log('\n📊 === GAME COMPLETED - CALCULATING TOTAL TIME ===');
-            
             // Calculate total time including all failed attempts
             // Sum of: (successful level times + accumulated failed time for each level)
             const totalFromLevels = prev.levelStats.reduce((sum, ls) => {
               const successTime = ls.timeSpent || 0;
               const failedTime = ls.accumulatedFailedTime || 0;
               const levelTotal = successTime + failedTime;
-              console.log(`Level ${ls.level}: Success=${successTime}ms (${(successTime/1000).toFixed(2)}s), Failed=${failedTime}ms (${(failedTime/1000).toFixed(2)}s), Total=${levelTotal}ms (${(levelTotal/1000).toFixed(2)}s)`);
               return sum + successTime + failedTime;
             }, 0);
-            
-            console.log(`TOTAL TIME: ${totalFromLevels}ms (${(totalFromLevels/1000).toFixed(2)}s)`);
-            console.log('=================================================\n');
             
             const finalStats = {
               ...prev,
@@ -834,7 +706,6 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
         // Show new pattern after delay (reduced for faster progression)
         nextLevelTimeoutRef.current = setTimeout(async () => {
           if (!shouldContinueGame.current) return; // Safety check
-          console.log(`\n=== LEVEL ${nextLevel} ===`);
           isInputPhaseActive.current = false; // Reset input phase before showing pattern
           await showPatternDisplay(newPattern);
         }, 800);
@@ -848,18 +719,14 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
           currentStep: nextStep,
           lastEvent: `Correct! Next target: Pad ${nextTarget + 1} (${nextStep + 1}/${totalSteps})`,
         }));
-        
-        console.log(`Moving to step ${nextStep + 1}/${totalSteps}, waiting for Pad ${nextTarget + 1}`);
       }
     } else {
       // Wrong pad pressed
-      console.log(`❌ Wrong pad! Giving error feedback`);
       
       // Capture failed attempt time IMMEDIATELY before any delays or animations
       let failedAttemptTime = 0;
       if (currentLevelStatsRef.current && currentLevelStatsRef.current.startTime > 0) {
         failedAttemptTime = Date.now() - currentLevelStatsRef.current.startTime;
-        console.log(`⏱️ Failed attempt time captured: ${failedAttemptTime}ms (${(failedAttemptTime/1000).toFixed(2)}s)`);
       }
       
       // Record failure in current level stats
@@ -899,12 +766,7 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
         currentLevelStatsRef.current.timeSpent = undefined;
         currentLevelStatsRef.current.accumulatedFailedTime = newAccumulatedTime;
         
-        console.log(`⏱️ Total accumulated failed time: ${newAccumulatedTime}ms (${(newAccumulatedTime/1000).toFixed(2)}s)`);
       }
-      
-      if (config.mistakeBehavior === 'restart') {
-        // Restart from Level 1 completely
-        console.log(`Restarting from Level 1 due to mistake`);
         
         const newPattern = generatePattern(1);
         setGameState(prev => ({
@@ -921,7 +783,6 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
         }, 800);
       } else {
         // Continue - restart current pattern from the beginning
-        console.log(`Restarting current pattern from beginning`);
         const currentPatternCopy = [...gameState.currentPattern]; // Save current pattern
         setGameState(prev => ({
           ...prev,
@@ -930,7 +791,6 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
         }));
         restartTimeoutRef.current = setTimeout(async () => {
           if (!shouldContinueGame.current) return; // Safety check
-          console.log(`🔄 Restarting with current pattern: [${currentPatternCopy.join(', ')}]`);
           isInputPhaseActive.current = false; // Reset input phase before showing pattern
           await showPatternDisplay(currentPatternCopy);
         }, 600);
@@ -965,11 +825,8 @@ const IoTPatternGameScreen: React.FC<IoTPatternGameScreenProps> = ({ config, onB
           if (currentButtonState && !previousState) {
             // Debounce: ignore if pressed too recently (within 200ms)
             if (currentTime - lastPressTime > 200) {
-              console.log(`🔘 Button ${index + 1} pressed - triggering handlePadPress`);
               lastButtonPressTime.current[index] = currentTime;
               handlePadPress(index);
-            } else {
-              console.log(`🔘 Button ${index + 1} press ignored (debounced)`);
             }
           }
           

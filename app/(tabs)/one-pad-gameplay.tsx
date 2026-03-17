@@ -46,7 +46,6 @@ const OnePadGameplayScreen = () => {
 
       await device.writeCharacteristic(CHARACTERISTIC.LED, command);
     } catch (error) {
-      console.error(`Error sending LED command:`, error);
     }
   }, [connectedDevice, selectedPad]);
 
@@ -69,11 +68,8 @@ const OnePadGameplayScreen = () => {
     if (params.config) {
       try {
         const parsedConfig = JSON.parse(params.config as string);
-        console.log('📋 Parsed config from params:', parsedConfig);
-        console.log('⏰ Session Time Limit from params:', parsedConfig.sessionTimeLimit);
         updateConfig(parsedConfig);
       } catch (error) {
-        console.error('Error parsing config:', error);
       }
     }
   }, [params.config, updateConfig]);
@@ -148,7 +144,6 @@ const OnePadGameplayScreen = () => {
       
       Alert.alert('สำเร็จ', 'บันทึกเซสชันเกมสำเร็จ!');
     } catch (error) {
-      console.error('❌ Error saving session:', error);
       setLastSaveStatus('error');
       Alert.alert('ข้อผิดพลาด', 'บันทึกเซสชันเกมไม่สำเร็จ');
     } finally {
@@ -216,7 +211,6 @@ const OnePadGameplayScreen = () => {
   }, [stopGame]);
 
   const handleStartGame = useCallback(() => {
-    console.log('🎮 Starting game...');
     resetStats();
     setIsSessionSaved(false);
     sessionStartTimeRef.current = Date.now();
